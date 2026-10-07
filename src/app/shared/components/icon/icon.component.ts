@@ -19,13 +19,20 @@ export type IconName =
   | 'clock'
   | 'check-circle'
   | 'error'
-  | 'eye';
+  | 'eye'
+  | 'eye-off'
+  | 'mail'
+  | 'logout';
 const PATHS: Record<IconName, string> = {
   user: 'M8 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0 M5 21v-2a7 7 0 0 1 14 0v2z',
   clock: 'M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M12 6v6l4 2',
   'check-circle': 'M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M7 12l3 3 7-7',
   error: 'M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M12 7v6 M12 16v1',
   eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 M9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0',
+  'eye-off':
+    'M3 3l18 18 M10.6 5.1A9.8 9.8 0 0 1 12 5c6 0 10 7 10 7a17 17 0 0 1-3 3.8 M6.5 6.6C3.7 8.5 2 12 2 12s4 7 10 7c1.7 0 3.2-.5 4.5-1.3 M9.9 9.9a3 3 0 0 0 4.2 4.2',
+  mail: 'M3 5h18v14H3z M3 6l9 7 9-7',
+  logout: 'M9 21H5V3h4 M16 17l5-5-5-5 M21 12H9',
   dashboard: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
   zones: 'M3 9l9-6 9 6v12H3z M8 21v-8h8v8 M3 9h18',
   alerts: 'M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10 M10 21h4',

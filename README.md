@@ -109,25 +109,15 @@ npm start
 
 La URL está en `src/environments/environment.ts` (desarrollo HTTP), `environment.production.ts` (producción HTTP) y `environment.mock.ts` (demo). El valor predeterminado es `/api/v1`. `proxy.conf.json` dirige `/api` al Core en `http://localhost:8080` durante `ng serve`, evitando requerir cambios CORS en el backend. Si el Core usa otro puerto, ajustar el proxy. En producción configurar el reverse proxy para el mismo origen o cambiar `apiBaseUrl` a la URL pública correcta y permitir ese origen en el backend.
 
-### JWT temporal de desarrollo
+### Inicio de sesión
 
-No existe login frontend todavía. Obtener un JWT **real** del IAM del Core, por ejemplo mediante `/api/v1/auth/login` en Swagger. En la consola del navegador del frontend:
+La ruta `/login` autentica contra `POST /api/v1/auth/login` del IAM del Core. Todas las demás rutas están protegidas por `authGuard`: sin sesión redirigen a `/login` y, tras ingresar, vuelven a la ruta solicitada. El encabezado muestra el usuario y la organización reales y permite cerrar sesión (`POST /api/v1/auth/logout`).
 
-```javascript
-sessionStorage.setItem('machineguard.development.jwt', '<JWT_REAL_SIN_PREFIJO_BEARER>');
-location.reload();
-```
+`SessionService` (IAM) mantiene la sesión y la guarda en `sessionStorage` (`machineguard.session`), por lo que sobrevive a una recarga y termina al cerrar la pestaña. La contraseña nunca se almacena. Cuando el Core responde `401` por un access token vencido, `sessionRefreshInterceptor` renueva la sesión una sola vez con `POST /api/v1/auth/refresh` (el refresh token rota) y repite la solicitud; si la renovación falla, cierra la sesión y vuelve a `/login`.
 
-El token nunca se configura en el código fuente ni en un environment compilado. Para retirarlo:
+`AccessTokenProvider` es el port de IAM y `ConfiguredAccessTokenProvider` entrega el JWT de la sesión. El interceptor adjunta únicamente `Authorization: Bearer <JWT>` y solo a la URL/origen/path configurados. No añade `X-Organization-Id` ni `X-User-Id`.
 
-```javascript
-sessionStorage.removeItem('machineguard.development.jwt');
-location.reload();
-```
-
-`AccessTokenProvider` es el port de IAM. `ConfiguredAccessTokenProvider` prioriza un JWT del AuthContext real y usa `DevelopmentTokenStore` solo cuando `developmentTokenEnabled` está habilitado. Producción y modo mock lo deshabilitan. Al integrar login real, retirar el fallback o sustituir el provider del port en `app.config.ts`.
-
-El interceptor adjunta únicamente `Authorization: Bearer <JWT>` y solo a la URL/origen/path configurados. No añade `X-Organization-Id` ni `X-User-Id`. Sin token, un 401 se muestra como error de carga; no se inventa una sesión ni se convierten fallos de autenticación en datos demo.
+El modo mock (`npm run start:mock`) no usa Core ni sesión: los guards lo dejan pasar y el perfil es el fixture de presentación.
 
 ### Modo mock
 
