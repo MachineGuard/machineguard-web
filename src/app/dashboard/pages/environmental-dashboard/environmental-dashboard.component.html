@@ -1,0 +1,100 @@
+@if (viewModel$ | async; as vm) {
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow mono">
+        WAREHOUSE MONITORING <span>/</span> <strong>Zones</strong>
+      </p>
+      <div class="title-line">
+        <h1>Environmental Dashboard</h1>
+        @if (vm.updatedSeconds !== null) {
+          <span class="updated">Updated {{ vm.updatedSeconds }}s ago</span>
+        }
+      </div>
+    </div>
+    <a
+      class="button primary"
+      routerLink="/zones"
+      [queryParams]="{ action: 'add-point' }"
+      ><app-icon name="plus" />Add Monitored Point</a
+    >
+  </div>
+  <app-status-summary [items]="vm.summary" />
+  <section class="zones-grid" aria-label="Monitored zones">
+    @for (zone of vm.zones; track zone.id) {
+      <app-zone-card
+        [zone]="zone"
+        [canAcknowledge]="!!zone.acknowledgementAlertId"
+        [busy]="busy()"
+        (acknowledge)="acknowledgeAlert(zone.acknowledgementAlertId)"
+        (viewDetails)="showDetails($event, vm)"
+      />
+    } @empty {
+      <p>No monitoring zones available.</p>
+    }
+  </section>
+  <app-latest-alerts
+    [alerts]="vm.alerts"
+    [busy]="busy()"
+    (acknowledge)="acknowledgeAlert($event)"
+    (inspect)="showDetails($event, vm)"
+  />
+} @else {
+  @if (loadError()) {
+    <p class="error-state" role="alert">
+      Unable to load monitoring data. Please reload to try again.
+    </p>
+  } @else {
+    <p role="status">Loading environmental conditions&#8230;</p>
+  }
+}
+@if (feedback()) {
+  <div class="feedback" role="status">
+    <app-icon name="check-circle" /><span>{{ feedback() }}</span
+    ><button aria-label="Dismiss notification" (click)="feedback.set('')">
+      &times;
+    </button>
+  </div>
+}
+<dialog #detailsDialog aria-labelledby="details-title">
+  @if (selectedZone(); as zone) {
+    <div class="dialog-heading">
+      <h2 id="details-title">{{ zone.name }}</h2>
+      <button
+        class="icon-button"
+        aria-label="Close zone details"
+        (click)="closeDetails()"
+      >
+        ×
+      </button>
+    </div>
+    <p>{{ zone.description }}</p>
+    <app-status-badge
+      [label]="statusMeta[zone.status].label"
+      [tone]="statusMeta[zone.status].className"
+    />
+    <dl>
+      <dt>Temperature</dt>
+      <dd>{{ zone.temperature ?? "—" }} °C</dd>
+      <dt>Relative humidity</dt>
+      <dd>{{ zone.humidity ?? "—" }} %</dd>
+      <dt>Safe temperature range</dt>
+      <dd>
+        {{ zone.minTemperature ?? "—" }}–{{ zone.maxTemperature ?? "—" }}
+        °C
+      </dd>
+      <dt>Sensor nodes</dt>
+      <dd>{{ zone.onlineNodes }} online / {{ zone.offlineNodes }} offline</dd>
+      <dt>Last seen</dt>
+      <dd>{{ zone.lastSeenAt | date: "medium" }}</dd>
+      <dt>Last measurement</dt>
+      <dd>
+        {{
+          zone.lastUpdated
+            ? (zone.lastUpdated | date: "medium")
+            : "No current measurement"
+        }}
+      </dd>
+    </dl>
+    <button class="button" (click)="closeDetails()">Close</button>
+  }
+</dialog>

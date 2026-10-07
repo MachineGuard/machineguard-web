@@ -1,0 +1,31 @@
+<aside class="sidebar" [class.open]="open" id="main-navigation">
+  <a class="brand" routerLink="/dashboard" (click)="navigated.emit()"
+    ><span class="brand-mark"><app-icon name="shield" /></span>MachineGuard</a
+  >
+  <nav aria-label="Main navigation">
+    @for (link of links; track link.path) {
+      <a
+        [routerLink]="link.path"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        (click)="navigated.emit()"
+        ><app-icon [name]="link.icon" />{{ link.label }}</a
+      >
+    }
+  </nav>
+  @if (systemStatus$ | async; as status) {
+    <section class="system-status" aria-label="System status">
+      <div class="system-heading">
+        <span>SYSTEM STATUS</span
+        ><span
+          [class]="'system-dot ' + (status.offline ? 'has-offline' : '')"
+        ></span>
+      </div>
+      <strong>{{ status.online }} of {{ status.total }} nodes active</strong>
+      <p>
+        {{ status.offline }}
+        {{ status.offline === 1 ? "node" : "nodes" }} offline
+      </p>
+    </section>
+  }
+</aside>

@@ -1,0 +1,71 @@
+<section class="alerts-panel" aria-labelledby="latest-alerts-title">
+  <div class="panel-heading">
+    <div class="title">
+      <app-icon name="alerts" />
+      <h2 id="latest-alerts-title">Latest Alerts</h2>
+      @if (requiredCount) {
+        <span class="required-count mono"
+          >{{ requiredCount }} Action Required</span
+        >
+      }
+    </div>
+    <a routerLink="/incidents"
+      >View All Incident Logs <app-icon name="arrow"
+    /></a>
+  </div>
+  <ul class="alert-list">
+    @for (alert of alerts; track alert.id) {
+      <li [class]="'alert-row ' + statuses[alert.severity].tone">
+        <span class="event-dot"></span>
+        <div class="event-content">
+          <p>
+            <strong>{{ alert.zoneName }}</strong
+            ><span class="message"> &middot; {{ alert.message }}</span>
+          </p>
+          <div class="event-meta">
+            <time class="mono" [attr.datetime]="alert.raisedAt"
+              >{{ alert.raisedAt | date: "MMM d, HH:mm" : "UTC" }} UTC</time
+            ><span aria-hidden="true">&middot;</span
+            ><span class="event-status">{{
+              statuses[alert.severity].label
+            }}</span>
+            @if (alert.contextNote) {
+              <span aria-hidden="true">&middot;</span
+              ><span>{{ alert.contextNote }}</span>
+            }
+          </div>
+        </div>
+        <div class="event-action">
+          @if (alert.status === "ACKNOWLEDGED") {
+            <span class="acknowledged"
+              ><app-icon name="check-circle" />Acknowledged</span
+            >
+          } @else if (
+            alert.status === "PENDING" || alert.status === "ESCALATED"
+          ) {
+            <button
+              [class]="
+                'button small ' +
+                (alert.severity === 'CRITICAL' ? 'danger' : 'secondary')
+              "
+              [disabled]="busy"
+              (click)="
+                alert.severity === 'CRITICAL'
+                  ? acknowledge.emit(alert.id)
+                  : inspect.emit(alert.monitoringZoneId)
+              "
+            >
+              {{ alert.severity === "CRITICAL" ? "Acknowledge" : "Inspect" }}
+            </button>
+          } @else {
+            <span class="resolved" aria-label="Normal recovery event"
+              ><app-icon name="check-circle"
+            /></span>
+          }
+        </div>
+      </li>
+    } @empty {
+      <li class="empty">No recent alerts.</li>
+    }
+  </ul>
+</section>

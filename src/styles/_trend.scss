@@ -1,0 +1,24 @@
+.trend {
+  height: 32px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.trend-bar {
+  flex: 1;
+  min-width: 0;
+  background: var(--primary-container);
+  border-radius: 1px;
+}
+.trend-bar.near-limit {
+  background: #f3ca8b;
+}
+.trend-bar.out-of-range {
+  background: var(--error);
+}
+@for $level from 1 through 8 {
+  .level-#{$level} {
+    height: $level * 4px;
+  }
+}

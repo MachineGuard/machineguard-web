@@ -1,0 +1,165 @@
+header {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.facility {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eaf5fc;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: var(--primary);
+  min-height: 40px;
+  font-size: 12px;
+}
+.facility app-icon {
+  width: 16px;
+  height: 16px;
+}
+.facility-divider {
+  height: 16px;
+  width: 1px;
+  background: #c9dfe7;
+  margin: 0 8px;
+}
+select {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 0;
+  font-size: 12px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.language {
+  display: flex;
+  border-radius: 999px;
+  background: #e4f1fb;
+  padding: 4px;
+}
+.language button {
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  border-radius: 999px;
+  min-height: 32px;
+  min-width: 32px;
+  font-size: 11px;
+}
+.language button.selected {
+  background: white;
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px #0b1f2a12;
+}
+.divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+.user-button {
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+.avatar app-icon {
+  width: 18px;
+  height: 18px;
+}
+.user-copy {
+  font-size: 12px;
+  text-align: right;
+  font-weight: 600;
+}
+small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 400;
+}
+.notification-button {
+  position: relative;
+}
+.notification-button app-icon {
+  width: 18px;
+  height: 18px;
+}
+.notification-count {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  background: var(--error);
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  color: white;
+  font-size: 9px;
+  display: grid;
+  place-items: center;
+}
+.mobile-menu {
+  display: none;
+}
+@media (max-width: 1100px) {
+  header {
+    padding: 8px 24px;
+  }
+  .facility > span:first-of-type,
+  .facility-divider {
+    display: none;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+}
+@media (max-width: 760px) {
+  header {
+    padding: 8px;
+    gap: 0;
+  }
+  .mobile-menu {
+    display: inline-flex;
+  }
+  .facility {
+    padding: 0 8px;
+    gap: 4px;
+  }
+  .header-actions {
+    gap: 0;
+  }
+  .user-copy,
+  .divider {
+    display: none;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .user-button {
+    padding: 0 8px;
+  }
+}

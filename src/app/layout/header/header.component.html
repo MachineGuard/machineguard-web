@@ -1,0 +1,86 @@
+<header>
+  <button
+    class="icon-button mobile-menu"
+    aria-label="Toggle navigation"
+    aria-controls="main-navigation"
+    [attr.aria-expanded]="navigationOpen"
+    (click)="menuToggle.emit()"
+  >
+    <app-icon name="menu" />
+  </button>
+  @if (profile$ | async; as profile) {
+    <div class="facility">
+      <app-icon name="zones" /><span>{{ profile.facilityName }}</span
+      ><span class="facility-divider"></span
+      ><label class="sr-only" for="facility">Warehouse</label
+      ><select id="facility">
+        <option>{{ profile.warehouseName }}</option>
+      </select>
+    </div>
+    <div class="header-actions">
+      <div class="language" role="group" aria-label="Language preview">
+        <button
+          [class.selected]="language() === 'EN'"
+          (click)="language.set('EN')"
+          [attr.aria-pressed]="language() === 'EN'"
+          aria-label="English (preview)"
+        >
+          EN</button
+        ><button
+          [class.selected]="language() === 'ES'"
+          (click)="language.set('ES')"
+          [attr.aria-pressed]="language() === 'ES'"
+          aria-label="Spanish (preview)"
+        >
+          ES
+        </button>
+      </div>
+      <div class="popover-anchor">
+        <button
+          class="icon-button notification-button"
+          aria-label="Notifications"
+          [attr.aria-expanded]="notificationsOpen()"
+          (click)="
+            notificationsOpen.set(!notificationsOpen()); menuOpen.set(false)
+          "
+        >
+          <app-icon name="alerts" />
+          @if (notificationCount$ | async; as count) {
+            <span class="notification-count">{{ count }}</span>
+          }
+        </button>
+        @if (notificationsOpen()) {
+          <div class="popover">
+            <strong>Notifications</strong>
+            <p>Review the latest environmental events.</p>
+            <a routerLink="/alerts" (click)="notificationsOpen.set(false)"
+              >View alerts &rarr;</a
+            >
+          </div>
+        }
+      </div>
+      <span class="divider"></span>
+      <div class="popover-anchor">
+        <button
+          class="user-button"
+          aria-label="User preview"
+          [attr.aria-expanded]="menuOpen()"
+          (click)="menuOpen.set(!menuOpen()); notificationsOpen.set(false)"
+        >
+          <span class="user-copy"
+            >{{ profile.displayName }}<small>{{ profile.role }}</small></span
+          ><span class="avatar"><app-icon name="user" /></span>
+        </button>
+        @if (menuOpen()) {
+          <div class="popover">
+            <strong>Preview workspace</strong>
+            <p>
+              This profile is mock presentation data. Authentication has not
+              been connected.
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</header>

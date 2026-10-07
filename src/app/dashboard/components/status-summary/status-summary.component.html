@@ -1,0 +1,12 @@
+<section class="summary" aria-label="Zone status summary">
+  @for (item of items; track item.status) {
+    <article [class]="'summary-card ' + meta[item.status].className">
+      <span class="summary-dot"></span>
+      <div>
+        <strong>{{ item.count }} {{ meta[item.status].label }}</strong>
+        <p>{{ descriptions[item.status] }}</p>
+      </div>
+      <app-icon [name]="icons[item.status]" />
+    </article>
+  }
+</section>

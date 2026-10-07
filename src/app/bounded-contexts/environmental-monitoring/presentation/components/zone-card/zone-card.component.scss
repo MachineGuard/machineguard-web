@@ -1,0 +1,130 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.zone-card {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  min-height: 368px;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+.zone-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--status-color);
+}
+h3 {
+  color: var(--primary);
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+.description {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 20px;
+  margin: 0 0 8px;
+  max-width: 160px;
+  min-height: 40px;
+}
+app-status-badge {
+  align-self: flex-start;
+}
+.out-of-range app-status-badge {
+  --status-bg: var(--error);
+  --status-ink: white;
+}
+.measurements {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 16px;
+  white-space: nowrap;
+}
+.measurements p {
+  margin: 0;
+  font-weight: 500;
+}
+.temperature {
+  font-size: clamp(25px, 2.2vw, 36px);
+  letter-spacing: -1.5px;
+  line-height: 48px;
+}
+.temperature span {
+  margin-left: 3px;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.humidity {
+  font-size: 15px;
+}
+.humidity span {
+  color: var(--muted);
+  font-size: 10px;
+  font-family: var(--font-body);
+  margin-left: 3px;
+}
+.out-of-range .temperature {
+  color: var(--error);
+}
+.near-limit .temperature {
+  color: #97601a;
+}
+.offline .measurements {
+  color: var(--muted);
+}
+.offline-rule {
+  height: 32px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+.zone-information {
+  font-size: 12px;
+  line-height: 20px;
+}
+.zone-information p {
+  margin: 0;
+}
+.condition-note {
+  color: var(--status-ink);
+}
+.out-of-range .condition-note {
+  color: #b5192d;
+}
+.node-status {
+  color: var(--muted);
+  font-size: 11px;
+}
+.zone-action {
+  margin-top: auto;
+  padding-top: 24px;
+}
+.button {
+  width: 100%;
+  padding-inline: 8px;
+  font-size: 12px;
+}
+@media (max-width: 1300px) and (min-width: 1101px) {
+  .zone-card {
+    padding: 16px;
+  }
+  .measurements {
+    gap: 4px;
+  }
+  .temperature {
+    font-size: 26px;
+  }
+  .humidity {
+    font-size: 13px;
+  }
+}

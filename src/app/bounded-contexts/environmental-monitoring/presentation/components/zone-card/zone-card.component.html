@@ -1,0 +1,97 @@
+<article
+  [class]="'zone-card ' + statusMeta.className"
+  [attr.aria-label]="zone.name + ': ' + statusMeta.label"
+>
+  <h3>{{ zone.name }}</h3>
+  <p class="description">{{ zone.description }}</p>
+  <app-status-badge
+    [label]="statusMeta.label"
+    [tone]="statusMeta.className"
+    [monospace]="true"
+    [solid]="zone.status === 'OUT_OF_RANGE'"
+  />
+  <div class="measurements">
+    <span class="sr-only">Temperature</span>
+    <p class="temperature mono">
+      {{ zone.temperature === null ? "—" : (zone.temperature | number: "1.1-1")
+      }}<span>&deg;C</span>
+    </p>
+    <span class="sr-only">Relative humidity</span>
+    <p class="humidity mono">
+      {{ zone.humidity === null ? "—" : (zone.humidity | number: "1.0-0")
+      }}<span>% RH</span>
+    </p>
+  </div>
+  @if (zone.status !== "OFFLINE") {
+    <div
+      class="trend"
+      role="img"
+      [attr.aria-label]="'Recent temperature readings in ' + zone.name"
+    >
+      @for (bar of zone.temperatureTrend; track $index) {
+        <span [class]="'trend-bar level-' + bar.level + ' ' + bar.tone"></span>
+      }
+    </div>
+  } @else {
+    <div class="offline-rule"></div>
+  }
+  <div class="zone-information">
+    @if (zone.status === "OFFLINE") {
+      <p>Gateway offline for {{ zone.offlineMinutes }} min</p>
+    } @else if (zone.status === "OUT_OF_RANGE") {
+      <p class="condition-note">
+        {{ zone.deviationNote }}
+        @if (zone.excursionMinutes !== undefined) {
+          &middot; Excursion duration {{ zone.excursionMinutes }} min
+        }
+      </p>
+    } @else if (zone.status === "NEAR_LIMIT") {
+      <p class="condition-note">
+        Approaching {{ zone.maxTemperature | number: "1.1-1" }}&deg;C max limit
+      </p>
+    } @else {
+      <p>
+        Limit {{ zone.minTemperature }}&ndash;{{ zone.maxTemperature }}&deg;C
+        &middot; All parameters stable
+      </p>
+    }
+    <p class="node-status">
+      {{ zone.onlineNodes || zone.offlineNodes }}
+      {{ zone.onlineNodes || zone.offlineNodes | i18nPlural: nodePlural }}
+      {{ zone.onlineNodes ? "online" : "offline" }} &middot;
+      {{ zone.pointNames.join(", ") }}
+    </p>
+  </div>
+  <div class="zone-action">
+    @if (canAcknowledge) {
+      <button
+        class="button danger acknowledge-button"
+        [disabled]="busy"
+        (click)="acknowledge.emit(zone.id)"
+      >
+        <app-icon name="check-circle" />Acknowledge
+      </button>
+    } @else if (zone.status === "NEAR_LIMIT") {
+      <button
+        class="text-action details-button"
+        (click)="viewDetails.emit(zone.id)"
+      >
+        <app-icon name="error" /><span>Operating near upper boundary</span>
+      </button>
+    } @else if (zone.status === "OFFLINE") {
+      <button
+        class="text-action details-button"
+        (click)="viewDetails.emit(zone.id)"
+      >
+        <app-icon name="offline" /><span>Connection pending</span>
+      </button>
+    } @else {
+      <button
+        class="button secondary details-button"
+        (click)="viewDetails.emit(zone.id)"
+      >
+        <app-icon name="eye" />View details
+      </button>
+    }
+  </div>
+</article>

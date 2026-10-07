@@ -1,0 +1,141 @@
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.eyebrow {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  margin: 0 0 8px;
+}
+.eyebrow span {
+  margin-inline: 4px;
+}
+.eyebrow strong {
+  color: var(--primary);
+  font-weight: 500;
+}
+.title-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  color: var(--primary);
+}
+.updated {
+  background: #deeffa;
+  color: var(--muted);
+  padding: 4px 8px;
+  font-size: 10px;
+  border-radius: 999px;
+}
+.zones-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.feedback {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 16px 24px;
+  background: var(--text);
+  color: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  z-index: 50;
+  font-size: 12px;
+  line-height: 20px;
+}
+.feedback > app-icon {
+  color: var(--ok);
+}
+.feedback button {
+  color: white;
+  border: 0;
+  background: transparent;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 20px;
+}
+dialog {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: min(480px, calc(100vw - 32px));
+  padding: 24px;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+dialog::backdrop {
+  background: #0b1f2a66;
+}
+.dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+h2 {
+  font-size: 20px;
+  color: var(--primary);
+}
+dialog p {
+  color: var(--muted);
+  font-size: 12px;
+}
+dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+  font-size: 12px;
+}
+dt {
+  color: var(--muted);
+}
+dd {
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+.error-state {
+  padding: 24px;
+  background: #fbecef;
+  border-radius: var(--radius);
+}
+@media (max-width: 1100px) {
+  .zones-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .page-heading {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .zones-grid {
+    grid-template-columns: 1fr;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  .title-line {
+    gap: 8px;
+  }
+  .feedback {
+    padding: 16px;
+    gap: 8px;
+  }
+}

@@ -1,8 +1,23 @@
+import { WORKSPACE_REPOSITORY } from './bounded-contexts/iam/domain/repositories/workspace.repository';
+import { MockWorkspaceRepository } from './bounded-contexts/iam/infrastructure/repositories/mock-workspace.repository';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { apiContextInterceptor } from './core/interceptors/api-context.interceptor';
+import { MONITORING_REPOSITORY } from './bounded-contexts/environmental-monitoring/domain/repositories/monitoring.repository';
+import { MockMonitoringRepository } from './bounded-contexts/environmental-monitoring/infrastructure/repositories/mock-monitoring.repository';
+import { ALERT_REPOSITORY } from './bounded-contexts/alert-incident-management/domain/repositories/alert.repository';
+import { MockAlertRepository } from './bounded-contexts/alert-incident-management/infrastructure/repositories/mock-alert.repository';
 
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes)]
+  providers: [
+    { provide: WORKSPACE_REPOSITORY, useClass: MockWorkspaceRepository },
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([apiContextInterceptor])),
+    { provide: MONITORING_REPOSITORY, useClass: MockMonitoringRepository },
+    { provide: ALERT_REPOSITORY, useClass: MockAlertRepository },
+  ],
 };

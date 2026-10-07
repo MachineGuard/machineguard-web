@@ -1,0 +1,33 @@
+.eyebrow {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+h1 {
+  font-size: 28px;
+}
+section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  margin-top: 28px;
+}
+section > app-icon {
+  color: var(--primary);
+  width: 40px;
+  height: 40px;
+}
+h2 {
+  font-size: 19px;
+}
+p {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 13px;
+}
+a {
+  margin-top: 15px;
+}

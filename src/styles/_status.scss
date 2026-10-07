@@ -1,0 +1,55 @@
+.normal {
+  --status-color: var(--ok);
+  --status-bg: #e8f5f2;
+  --status-ink: #0f4c5c;
+}
+.near-limit {
+  --status-color: var(--warning);
+  --status-bg: #fff6e7;
+  --status-ink: #805416;
+}
+.out-of-range {
+  --status-color: var(--error);
+  --status-bg: #fbecef;
+  --status-ink: #a31929;
+}
+.offline {
+  --status-color: var(--offline);
+  --status-bg: #edf2f6;
+  --status-ink: #52667a;
+}
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--status-bg);
+  color: var(--status-ink);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 16px;
+}
+.status-badge app-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.status-badge.monospace {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+.status-badge.solid {
+  background: var(--status-color);
+  color: white;
+}
