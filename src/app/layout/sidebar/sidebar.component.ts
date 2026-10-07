@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { AsyncPipe } from '@angular/common';
 import { map } from 'rxjs';
 import { EnvironmentalMonitoringService } from '../../bounded-contexts/environmental-monitoring/application/services/environmental-monitoring.service';
@@ -18,7 +19,7 @@ import {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [AsyncPipe, RouterLink, RouterLinkActive, IconComponent],
+  imports: [AsyncPipe, RouterLink, RouterLinkActive, IconComponent, TranslatePipe],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,11 +38,11 @@ export class SidebarComponent {
   @Input() open = false;
   @Output() navigated = new EventEmitter<void>();
   readonly links: { label: string; path: string; icon: IconName }[] = [
-    { label: 'Panel', path: '/dashboard', icon: 'dashboard' },
-    { label: 'Zonas', path: '/zones', icon: 'zones' },
-    { label: 'Alertas', path: '/alerts', icon: 'alerts' },
-    { label: 'Incidentes', path: '/incidents', icon: 'incidents' },
-    { label: 'Reportes', path: '/reports', icon: 'reports' },
-    { label: 'Dispositivos', path: '/devices', icon: 'devices' },
+    { label: 'nav.dashboard', path: '/dashboard', icon: 'dashboard' },
+    { label: 'nav.zones', path: '/zones', icon: 'zones' },
+    { label: 'nav.alerts', path: '/alerts', icon: 'alerts' },
+    { label: 'nav.incidents', path: '/incidents', icon: 'incidents' },
+    { label: 'nav.reports', path: '/reports', icon: 'reports' },
+    { label: 'nav.devices', path: '/devices', icon: 'devices' },
   ];
 }

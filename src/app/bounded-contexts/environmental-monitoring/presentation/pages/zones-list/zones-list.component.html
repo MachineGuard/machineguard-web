@@ -1,15 +1,14 @@
 <div class="page">
   <div class="page-head">
     <div>
-      <h1>Zonas</h1>
+      <h1>{{ "zones.title" | t }}</h1>
       <p class="lead">
-        Zonas de monitoreo, puntos, sensores y rangos seguros de tu
-        organización.
+        {{ "zones.lead" | t }}
       </p>
     </div>
     @if (canEdit() && rows().length) {
       <button class="button primary" type="button" (click)="openForm()">
-        <app-icon name="plus" />Nueva zona
+        <app-icon name="plus" />{{ "zones.new" | t }}
       </button>
     }
   </div>
@@ -18,61 +17,60 @@
     @case ("loading") {
       <div class="panel skeleton" aria-busy="true">
         <span></span><span></span><span></span><span></span>
-        <p class="sr-only">Cargando zonas…</p>
+        <p class="sr-only">{{ "zones.loading" | t }}</p>
       </div>
     }
     @case ("error") {
       <div class="panel state" role="alert">
-        <h2>No se pudieron cargar las zonas</h2>
+        <h2>{{ "zones.error.title" | t }}</h2>
         <p>
-          El servicio no respondió. Tus datos no se perdieron; vuelve a
-          intentarlo en unos segundos.
+          {{ "common.serviceDown" | t }}
         </p>
         <button class="button primary compact" type="button" (click)="load()">
-          Reintentar
+          {{ "common.retry" | t }}
+
         </button>
       </div>
     }
     @case ("ready") {
       @if (rows().length === 0) {
         <div class="panel state">
-          <h2>Aún no hay zonas de monitoreo</h2>
+          <h2>{{ "zones.empty.title" | t }}</h2>
           <p>
-            Crea la zona, agrega un punto de monitoreo y define el rango seguro
-            de cada variable. Con eso la zona empieza a recibir mediciones.
+            {{ "zones.empty.text" | t }}
           </p>
           @if (canEdit()) {
             <button class="button primary" type="button" (click)="openForm()">
-              <app-icon name="plus" />Crear primera zona
+              <app-icon name="plus" />{{ "zones.empty.create" | t }}
             </button>
           } @else {
-            <p>Pide a un administrador que configure la primera zona.</p>
+            <p>{{ "zones.empty.viewer" | t }}</p>
           }
         </div>
       } @else {
         <div class="stat-grid">
           <div class="stat">
-            <strong>{{ rows().length }}</strong><span>Zonas registradas</span>
+            <strong>{{ rows().length }}</strong><span>{{ "zones.stat.total" | t }}</span>
           </div>
           <div class="stat">
             <strong>{{ readyCount() }}</strong
-            ><span>Listas para recibir mediciones</span>
+            ><span>{{ "zones.stat.ready" | t }}</span>
           </div>
           <div class="stat">
             <strong>{{ rows().length - readyCount() }}</strong
-            ><span>Con configuración pendiente</span>
+            ><span>{{ "zones.stat.pending" | t }}</span>
           </div>
         </div>
         <div class="panel table-scroll">
           <table class="data-table">
             <thead>
               <tr>
-                <th scope="col">Zona</th>
-                <th scope="col">Configuración</th>
-                <th scope="col">Puntos</th>
-                <th scope="col">Sensores</th>
-                <th scope="col">Rangos seguros</th>
-                <th scope="col"><span class="sr-only">Acciones</span></th>
+                <th scope="col">{{ "zones.col.zone" | t }}</th>
+                <th scope="col">{{ "zones.col.setup" | t }}</th>
+                <th scope="col">{{ "zones.col.points" | t }}</th>
+                <th scope="col">{{ "zones.col.sensors" | t }}</th>
+                <th scope="col">{{ "zones.col.ranges" | t }}</th>
+                <th scope="col"><span class="sr-only">{{ "common.actions" | t }}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -82,11 +80,11 @@
                     <a class="row-link" [routerLink]="['/zones', row.zone.id]">{{
                       row.zone.name
                     }}</a>
-                    <small>{{ row.zone.description || "Sin descripción" }}</small>
+                    <small>{{ row.zone.description || ("common.noDescription" | t) }}</small>
                   </td>
                   <td>
                     <app-status-badge
-                      [label]="row.setup.label"
+                      [label]="row.setup.key | t"
                       [tone]="row.setup.tone"
                     />
                   </td>
@@ -95,7 +93,7 @@
                   <td class="mono">{{ row.ranges }}</td>
                   <td class="align-end">
                     <a class="back-link" [routerLink]="['/zones', row.zone.id]">{{
-                      canEdit() ? "Configurar" : "Ver"
+                      (canEdit() ? "zones.configure" : "zones.view") | t
                     }}</a>
                   </td>
                 </tr>
@@ -109,19 +107,19 @@
 </div>
 
 @if (creating()) {
-  <app-modal heading="Nueva zona" (closed)="creating.set(false)">
+  <app-modal [heading]="'zones.new' | t" (closed)="creating.set(false)">
     <form class="form" [formGroup]="form" (ngSubmit)="create()" novalidate>
       @if (formError(); as message) {
         <p class="callout error" role="alert">
-          <app-icon name="error" /><span class="grow">{{ message }}</span>
+          <app-icon name="error" /><span class="grow">{{ message | t }}</span>
         </p>
       }
       <div class="field">
-        <label for="zone-name">Nombre</label>
+        <label for="zone-name">{{ "zones.form.name" | t }}</label>
         <input
           id="zone-name"
           formControlName="name"
-          placeholder="Cámara fría A"
+          [placeholder]="'zones.form.namePlaceholder' | t"
           autocomplete="off"
           [attr.aria-invalid]="submitted() && form.controls.name.invalid"
           [attr.aria-describedby]="
@@ -130,25 +128,26 @@
         />
         @if (submitted() && form.controls.name.invalid) {
           <p class="field-error" id="zone-name-error">
-            Ingresa un nombre para la zona.
+            {{ "zones.form.nameError" | t }}
           </p>
         }
       </div>
       <div class="field">
-        <label for="zone-description">Descripción <em>(opcional)</em></label>
+        <label for="zone-description">{{ "zones.form.description" | t }} <em>{{ "common.optional" | t }}</em></label>
         <input
           id="zone-description"
           formControlName="description"
-          placeholder="Almacén de lácteos"
+          [placeholder]="'zones.form.descriptionPlaceholder' | t"
           autocomplete="off"
         />
       </div>
       <div class="form-actions">
         <button class="button" type="button" (click)="creating.set(false)">
-          Cancelar
+          {{ "common.cancel" | t }}
+
         </button>
         <button class="button primary" type="submit" [disabled]="saving()">
-          {{ saving() ? "Creando…" : "Crear zona" }}
+          {{ (saving() ? "zones.form.creating" : "zones.form.create") | t }}
         </button>
       </div>
     </form>

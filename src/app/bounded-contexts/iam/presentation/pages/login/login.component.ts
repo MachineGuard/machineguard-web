@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { LoginShowcaseComponent } from './login-showcase.component';
 import { SessionService } from '../../../application/services/session.service';
@@ -9,7 +10,7 @@ import { SessionService } from '../../../application/services/session.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, LoginShowcaseComponent],
+  imports: [ReactiveFormsModule, IconComponent, LoginShowcaseComponent, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,7 +58,7 @@ export class LoginComponent {
 
 function messageFor(error: unknown): string {
   const status = error instanceof HttpErrorResponse ? error.status : -1;
-  if (status === 401 || status === 400) return 'Correo o contraseña incorrectos.';
-  if (status === 0 || status >= 502) return 'No se pudo conectar con el servidor. Inténtalo de nuevo en unos minutos.';
-  return 'No se pudo iniciar sesión. Inténtalo de nuevo.';
+  if (status === 401 || status === 400) return 'login.error.credentials';
+  if (status === 0 || status >= 502) return 'login.error.connection';
+  return 'login.error.generic';
 }

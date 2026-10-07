@@ -1,7 +1,7 @@
 <header>
   <button
     class="icon-button mobile-menu"
-    aria-label="Toggle navigation"
+    [attr.aria-label]="'nav.toggle' | t"
     aria-controls="main-navigation"
     [attr.aria-expanded]="navigationOpen"
     (click)="menuToggle.emit()"
@@ -12,25 +12,19 @@
     <div class="facility">
       <app-icon name="zones" /><span>{{ profile.facilityName }}</span
       ><span class="facility-divider"></span
-      ><label class="sr-only" for="facility">Warehouse</label
+      ><label class="sr-only" for="facility">{{ "header.scope" | t }}</label
       ><select id="facility">
-        <option>{{ profile.warehouseName }}</option>
+        <option>{{ profile.warehouseName | t }}</option>
       </select>
     </div>
     <div class="header-actions">
-      <div class="language" role="group" aria-label="Language preview">
+      <div class="language" role="group" [attr.aria-label]="'header.language' | t">
         <button
-          [class.selected]="language() === 'EN'"
-          (click)="language.set('EN')"
-          [attr.aria-pressed]="language() === 'EN'"
-          aria-label="English (preview)"
+          [class.selected]="language() === 'en'" (click)="useLanguage('en')" [attr.aria-pressed]="language() === 'en'" [attr.aria-label]="'header.english' | t"
         >
           EN</button
         ><button
-          [class.selected]="language() === 'ES'"
-          (click)="language.set('ES')"
-          [attr.aria-pressed]="language() === 'ES'"
-          aria-label="Spanish (preview)"
+          [class.selected]="language() === 'es'" (click)="useLanguage('es')" [attr.aria-pressed]="language() === 'es'" [attr.aria-label]="'header.spanish' | t"
         >
           ES
         </button>
@@ -38,7 +32,7 @@
       <div class="popover-anchor">
         <button
           class="icon-button notification-button"
-          aria-label="Notifications"
+          [attr.aria-label]="'header.notifications' | t"
           [attr.aria-expanded]="notificationsOpen()"
           (click)="
             notificationsOpen.set(!notificationsOpen()); menuOpen.set(false)
@@ -51,10 +45,10 @@
         </button>
         @if (notificationsOpen()) {
           <div class="popover">
-            <strong>Notifications</strong>
-            <p>Review the latest environmental events.</p>
+            <strong>{{ "header.notifications" | t }}</strong>
+            <p>{{ "header.notifications.text" | t }}</p>
             <a routerLink="/alerts" (click)="notificationsOpen.set(false)"
-              >View alerts &rarr;</a
+              >{{ "header.notifications.link" | t }} &rarr;</a
             >
           </div>
         }
@@ -63,12 +57,12 @@
       <div class="popover-anchor">
         <button
           class="user-button"
-          aria-label="Account menu"
+          [attr.aria-label]="'header.account' | t"
           [attr.aria-expanded]="menuOpen()"
           (click)="menuOpen.set(!menuOpen()); notificationsOpen.set(false)"
         >
           <span class="user-copy"
-            >{{ profile.displayName }}<small>{{ profile.role }}</small></span
+            >{{ profile.displayName }}<small>{{ profile.role | t }}</small></span
           ><span class="avatar"><app-icon name="user" /></span>
         </button>
         @if (menuOpen()) {
@@ -77,11 +71,11 @@
               <strong>{{ current.user.fullName }}</strong>
               <p>{{ current.user.email }}</p>
               <button class="sign-out" (click)="signOut()">
-                <app-icon name="logout" />Sign out
+                <app-icon name="logout" />{{ "header.signOut" | t }}
               </button>
             } @else {
-              <strong>Preview workspace</strong>
-              <p>This profile is mock presentation data.</p>
+              <strong>{{ "header.preview.title" | t }}</strong>
+              <p>{{ "header.preview.text" | t }}</p>
             }
           </div>
         }

@@ -125,6 +125,14 @@ El modo mock (`npm run start:mock`) no usa Core ni sesión: los guards lo dejan 
 - `/reports` lista las excursiones (filtros por zona y estado) y `/reports/excursions/:excursionId` muestra el detalle con el Measurement History y las no conformidades.
 - El dashboard y el estado del sistema se actualizan solos cada 15 s. Si una actualización falla se conserva la última lectura; solo la primera carga muestra el estado de error.
 
+### Idiomas (i18n)
+
+Los textos de la interfaz viven en `src/i18n/es.json` y `src/i18n/en.json`, con las mismas claves planas (`zones.title`, `login.error.credentials`). Para agregar un texto: añade la clave a los dos archivos y úsala con el pipe `t` (`{{ "zones.title" | t }}`, con parámetros `{{ "dashboard.updated" | t: { n: 12 } }}`) o con `I18nService.t()` en TypeScript. Una prueba falla si a un idioma le falta una clave o un parámetro.
+
+El idioma por defecto es español. El selector EN/ES del encabezado cambia toda la interfaz sin recargar y la elección se recuerda en `localStorage` (`machineguard.language`). Fechas y horas siguen el idioma elegido. Los datos que vienen del Core (nombres de zonas, puntos, lotes) no se traducen.
+
+Sin el backend de Alert & Incident Management, la aplicación conectada al Core no muestra alertas inventadas: usa `NoAlertsRepository`. Las alertas de ejemplo solo aparecen en el modo mock.
+
 ### Modo mock
 
 ```powershell

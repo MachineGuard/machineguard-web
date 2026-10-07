@@ -7,7 +7,9 @@ import { MockWorkspaceRepository } from './bounded-contexts/iam/infrastructure/r
 import { SessionWorkspaceRepository } from './bounded-contexts/iam/infrastructure/repositories/session-workspace.repository';
 import { sessionRefreshInterceptor } from './bounded-contexts/iam/infrastructure/interceptors/session-refresh.interceptor';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, TitleStrategy } from '@angular/router';
+import { I18nTitleStrategy } from './core/i18n/i18n-title.strategy';
+import { NoAlertsRepository } from './bounded-contexts/alert-incident-management/infrastructure/repositories/no-alerts.repository';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { apiContextInterceptor } from './core/interceptors/api-context.interceptor';
 import { MONITORING_REPOSITORY } from './bounded-contexts/environmental-monitoring/domain/repositories/monitoring.repository';
@@ -22,9 +24,10 @@ export const appConfig: ApplicationConfig = {
     { provide: WORKSPACE_REPOSITORY, useClass: environment.monitoringSource === 'mock' ? MockWorkspaceRepository : SessionWorkspaceRepository },
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    { provide: TitleStrategy, useClass: I18nTitleStrategy },
     provideHttpClient(withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])),
     { provide: MONITORING_REPOSITORY, useClass: environment.monitoringSource === 'mock' ? MockMonitoringRepository : ApiMonitoringRepository },
     { provide: ACCESS_TOKEN_PROVIDER, useExisting: ConfiguredAccessTokenProvider },
-    { provide: ALERT_REPOSITORY, useClass: MockAlertRepository },
+    { provide: ALERT_REPOSITORY, useClass: environment.monitoringSource === 'mock' ? MockAlertRepository : NoAlertsRepository },
   ],
 };

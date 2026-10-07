@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
+import { I18nService } from '../../../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { MonitoringApiClient } from '../../../../environmental-monitoring/infrastructure/api/monitoring-api.client';
 import { MonitoringZoneDto } from '../../../../environmental-monitoring/infrastructure/api/monitoring-zone.dto';
 import { SessionService } from '../../../../iam/application/services/session.service';
@@ -9,9 +11,9 @@ import { IconComponent } from '../../../../../shared/components/icon/icon.compon
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { StatusBadgeComponent } from '../../../../../shared/components/status-badge/status-badge.component';
 import { LoadState, loadInto } from '../../../../../shared/format/load-state';
-import { formatDateTime, formatDuration, formatTime, formatValue, saveErrorMessage, VARIABLES } from '../../../../../shared/format/presentation';
+import { formatDuration, formatValue, saveErrorKey, UNITS } from '../../../../../shared/format/presentation';
 import { ExcursionDetailDto, ExcursionsApiClient, MeasurementHistoryDto } from '../../../infrastructure/api/excursions-api.client';
-import { EXCURSION_STATUS, SEVERITY_LABELS } from '../../excursion.presentation';
+import { EXCURSION_TONE } from '../../excursion.presentation';
 
 interface Loaded {
   detail: ExcursionDetailDto;
@@ -23,7 +25,7 @@ interface Loaded {
 @Component({
   selector: 'app-excursion-detail',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
   templateUrl: './excursion-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,6 +34,7 @@ export class ExcursionDetailComponent {
   private readonly monitoring = inject(MonitoringApiClient);
   private readonly excursionId = inject(ActivatedRoute).snapshot.paramMap.get('excursionId') ?? '';
   private readonly session = inject(SessionService).session;
+  private readonly i18n = inject(I18nService);
 
   readonly state = signal<LoadState<Loaded>>({ status: 'loading' });
   readonly canEdit = computed(() => this.session()?.user.role === 'ADMIN');
@@ -40,7 +43,8 @@ export class ExcursionDetailComponent {
     if (state.status !== 'ready') return null;
     const { detail, history, zones } = state.data;
     const excursion = detail.excursion;
-    const variable = VARIABLES[excursion.environmentalVariable];
+    const unit = UNITS[excursion.environmentalVariable];
+    const variable = this.i18n.t(`variable.short.${excursion.environmentalVariable}`);
     const zone = zones.find((z) => z.id === excursion.monitoringZoneId);
     const range = zone?.thresholds.find((t) => t.environmentalVariable === excursion.environmentalVariable);
     const above = excursion.peakValue >= excursion.thresholdValue;
@@ -51,15 +55,15 @@ export class ExcursionDetailComponent {
         : above ? value > excursion.thresholdValue : value < excursion.thresholdValue;
     const scale = Math.max(Math.abs(excursion.peakValue), Math.abs(excursion.thresholdValue)) || 1;
     return {
-      title: `Excursión de ${variable.label.toLowerCase()}`,
-      status: EXCURSION_STATUS[excursion.status],
-      context: `${zone?.name ?? 'Zona eliminada'} · ${pointName(excursion.monitoringPointId)} · ${formatDateTime(excursion.startedAt)}`,
-      peak: `${formatValue(excursion.peakValue)} ${variable.unit}`,
-      limit: `${formatValue(excursion.thresholdValue)} ${variable.unit}`,
-      limitLabel: above ? 'Límite superior superado' : 'Límite inferior superado',
+      title: this.i18n.t('excursion.title', { variable: this.i18n.language() === 'es' ? variable.toLowerCase() : variable }),
+      status: { label: this.i18n.t(`excursion.status.${excursion.status}`), tone: EXCURSION_TONE[excursion.status] },
+      context: `${zone?.name ?? this.i18n.t('reports.deletedZone')} · ${pointName(excursion.monitoringPointId)} · ${this.i18n.dateTime(excursion.startedAt)}`,
+      peak: `${formatValue(excursion.peakValue)} ${unit}`,
+      limit: `${formatValue(excursion.thresholdValue)} ${unit}`,
+      limitLabel: above ? 'excursion.limitAbove' : 'excursion.limitBelow',
       duration: formatDuration(excursion.durationSeconds),
-      severity: SEVERITY_LABELS[excursion.severity],
-      range: range ? `${formatValue(range.minimumValue)} – ${formatValue(range.maximumValue)} ${variable.unit}` : null,
+      severity: this.i18n.t(`excursion.severity.${excursion.severity}`),
+      range: range ? `${formatValue(range.minimumValue)} – ${formatValue(range.maximumValue)} ${unit}` : null,
       correctiveAction: excursion.correctiveAction,
       hasIncident: excursion.incidentId !== null,
       ongoing: excursion.status === 'ONGOING',
@@ -67,15 +71,15 @@ export class ExcursionDetailComponent {
       measurements: (history?.measurements ?? [])
         .filter((m) => m.environmentalVariable === excursion.environmentalVariable)
         .map((m) => ({
-          time: formatTime(m.recordedAt),
+          time: this.i18n.time(m.recordedAt),
           point: pointName(m.monitoringPointId),
-          value: `${formatValue(m.value)} ${variable.unit}`,
+          value: `${formatValue(m.value)} ${unit}`,
           out: isOut(m.value),
           width: Math.min(100, Math.max(4, (Math.abs(m.value) / scale) * 100)),
         })),
       nonConformities: detail.nonConformities.map((item) => ({
         ...item,
-        registeredAt: formatDateTime(item.registeredAt),
+        registeredAt: this.i18n.dateTime(item.registeredAt),
       })),
     };
   });
@@ -131,7 +135,7 @@ export class ExcursionDetailComponent {
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          this.formError.set(saveErrorMessage(error, 'Ese lote ya está registrado en esta excursión.'));
+          this.formError.set(saveErrorKey(error, 'excursion.nc.conflict'));
         },
       });
   }

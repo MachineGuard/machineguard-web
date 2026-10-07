@@ -3,9 +3,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  inject,
   Output,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { I18nService } from '../../../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { RouterLink } from '@angular/router';
 import { Alert, AlertSeverity } from '../../../domain/models/alert.models';
 import {
@@ -16,12 +18,13 @@ import { IconComponent } from '../../../../../shared/components/icon/icon.compon
 @Component({
   selector: 'app-latest-alerts',
   standalone: true,
-  imports: [RouterLink, DatePipe, StatusBadgeComponent, IconComponent],
+  imports: [RouterLink, StatusBadgeComponent, IconComponent, TranslatePipe],
   templateUrl: './latest-alerts.component.html',
   styleUrl: './latest-alerts.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LatestAlertsComponent {
+  readonly i18n = inject(I18nService);
   get requiredCount(): number {
     return this.alerts.filter(
       (alert) =>
@@ -37,8 +40,8 @@ export class LatestAlertsComponent {
     AlertSeverity,
     { label: string; tone: StatusTone }
   > = {
-    CRITICAL: { label: 'Out of range', tone: 'out-of-range' },
-    WARNING: { label: 'Near limit', tone: 'near-limit' },
-    INFO: { label: 'Normal', tone: 'normal' },
+    CRITICAL: { label: 'status.OUT_OF_RANGE', tone: 'out-of-range' },
+    WARNING: { label: 'status.NEAR_LIMIT', tone: 'near-limit' },
+    INFO: { label: 'status.NORMAL', tone: 'normal' },
   };
 }

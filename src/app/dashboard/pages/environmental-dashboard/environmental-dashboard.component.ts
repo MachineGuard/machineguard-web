@@ -1,4 +1,6 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,7 +27,7 @@ import { STATUS_META } from '../../../bounded-contexts/environmental-monitoring/
   standalone: true,
   imports: [
     AsyncPipe,
-    DatePipe,
+    TranslatePipe,
     RouterLink,
     ZoneCardComponent,
     LatestAlertsComponent,
@@ -39,11 +41,13 @@ import { STATUS_META } from '../../../bounded-contexts/environmental-monitoring/
 })
 export class EnvironmentalDashboardComponent {
   private readonly facade = inject(DashboardFacade);
+  readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   @ViewChild('detailsDialog')
   private detailsDialog?: ElementRef<HTMLDialogElement>;
   readonly loadError = signal(false);
   readonly busy = signal(false);
+  /** Translation key of the notification, or '' when there is none. */
   readonly feedback = signal('');
   readonly selectedZone = signal<MonitoringZoneViewModel | null>(null);
   readonly statusMeta = STATUS_META;
@@ -66,11 +70,11 @@ export class EnvironmentalDashboardComponent {
       .subscribe({
         next: () =>
           this.feedback.set(
-            'Alert acknowledged in this demo session. The environmental deviation remains active.',
+            'dashboard.ackOk',
           ),
         error: () =>
           this.feedback.set(
-            'Could not acknowledge the alert. Please try again.',
+            'dashboard.ackFail',
           ),
       });
   }

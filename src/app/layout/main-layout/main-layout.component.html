@@ -1,9 +1,9 @@
-<a class="skip-link" href="#main-content">Skip to content</a>
+<a class="skip-link" href="#main-content">{{ "common.skip" | t }}</a>
 <app-sidebar [open]="menuOpen()" (navigated)="menuOpen.set(false)" />
 @if (menuOpen()) {
   <button
     class="backdrop"
-    aria-label="Close navigation"
+    [attr.aria-label]="'nav.close' | t"
     (click)="menuOpen.set(false)"
   ></button>
 }
@@ -15,8 +15,7 @@
   <main id="main-content"><router-outlet /></main>
   <footer class="workspace-footer">
     <span
-      >Terms <span aria-hidden="true">&middot;</span> Privacy
-      <span aria-hidden="true">&middot;</span> <strong>EN | ES</strong></span
+      >{{ "common.terms" | t }} <span aria-hidden="true">&middot;</span> {{ "common.privacy" | t }}</span
     ><span>MachineGuard</span>
   </footer>
 </div>

@@ -13,6 +13,8 @@ export interface MonitoringZoneViewModel {
   offlineNodes: number;
   lastUpdated?: string;
   deviationNote?: string;
+  /** Same deviation in a form the presentation layer can translate. */
+  deviation?: { variable: 'TEMPERATURE' | 'HUMIDITY'; direction: 'above' | 'below'; limit: number };
   pointNames: string[];
   lastSeenAt?: string;
   offlineMinutes?: number;

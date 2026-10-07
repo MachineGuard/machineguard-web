@@ -1,11 +1,11 @@
-<p class="eyebrow">{{ context }}</p>
-<h1>{{ title }}</h1>
+<p class="eyebrow">{{ context | t }}</p>
+<h1>{{ title | t }}</h1>
 <section>
   <app-icon name="shield" />
-  <h2>{{ title }}</h2>
-  <p>{{ description }}</p>
-  <p>Esta función está planificada para una próxima iteración.</p>
+  <h2>{{ title | t }}</h2>
+  <p>{{ description | t }}</p>
+  <p>{{ "placeholder.planned" | t }}</p>
   <a class="button primary" routerLink="/dashboard"
-    >Volver al panel <app-icon name="arrow"
+    >{{ "placeholder.back" | t }} <app-icon name="arrow"
   /></a>
 </section>

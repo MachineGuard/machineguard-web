@@ -1,18 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { SessionService } from '../../../../iam/application/services/session.service';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { StatusBadgeComponent, StatusTone } from '../../../../../shared/components/status-badge/status-badge.component';
 import { LoadState, loadInto } from '../../../../../shared/format/load-state';
-import { saveErrorMessage, VARIABLES } from '../../../../../shared/format/presentation';
+import { saveErrorKey, UNITS } from '../../../../../shared/format/presentation';
 import { MonitoringApiClient } from '../../../infrastructure/api/monitoring-api.client';
 import { EnvironmentalVariableDto, MonitoringZoneDto } from '../../../infrastructure/api/monitoring-zone.dto';
 
 interface ZoneRow {
   zone: MonitoringZoneDto;
-  setup: { label: string; tone: StatusTone };
+  setup: { key: string; tone: StatusTone };
   ranges: string;
   ready: boolean;
 }
@@ -20,7 +21,7 @@ interface ZoneRow {
 @Component({
   selector: 'app-zones-list',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
   templateUrl: './zones-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -70,7 +71,7 @@ export class ZonesListComponent {
       next: (zone) => void this.router.navigate(['/zones', zone.id]),
       error: (error: unknown) => {
         this.saving.set(false);
-        this.formError.set(saveErrorMessage(error, 'Ya existe una zona con esos datos.'));
+        this.formError.set(saveErrorKey(error, 'zones.form.conflict'));
       },
     });
   }
@@ -79,17 +80,16 @@ export class ZonesListComponent {
 function toRow(zone: MonitoringZoneDto): ZoneRow {
   const range = (variable: EnvironmentalVariableDto) => {
     const threshold = zone.thresholds.find((t) => t.environmentalVariable === variable);
-    return threshold ? `${threshold.minimumValue}–${threshold.maximumValue} ${VARIABLES[variable].unit}` : '—';
+    return threshold ? `${threshold.minimumValue}–${threshold.maximumValue} ${UNITS[variable]}` : '—';
   };
   const hasPoints = zone.points.length > 0;
   const missing = (['TEMPERATURE', 'HUMIDITY'] as const).filter(
     (variable) => !zone.thresholds.some((t) => t.environmentalVariable === variable),
   );
-  let setup: ZoneRow['setup'] = { label: 'Completa', tone: 'normal' };
-  if (!hasPoints && missing.length === 2) setup = { label: 'Sin puntos ni rangos', tone: 'offline' };
-  else if (!hasPoints) setup = { label: 'Falta un punto de monitoreo', tone: 'near-limit' };
-  else if (missing.length === 2) setup = { label: 'Faltan los rangos seguros', tone: 'near-limit' };
-  else if (missing.length === 1)
-    setup = { label: `Falta rango de ${missing[0] === 'HUMIDITY' ? 'humedad' : 'temperatura'}`, tone: 'near-limit' };
+  let setup: ZoneRow['setup'] = { key: 'zones.setup.complete', tone: 'normal' };
+  if (!hasPoints && missing.length === 2) setup = { key: 'zones.setup.none', tone: 'offline' };
+  else if (!hasPoints) setup = { key: 'zones.setup.noPoint', tone: 'near-limit' };
+  else if (missing.length === 2) setup = { key: 'zones.setup.noRanges', tone: 'near-limit' };
+  else if (missing.length === 1) setup = { key: `zones.setup.missing.${missing[0]}`, tone: 'near-limit' };
   return { zone, setup, ranges: `${range('TEMPERATURE')} / ${range('HUMIDITY')}`, ready: hasPoints && missing.length < 2 };
 }

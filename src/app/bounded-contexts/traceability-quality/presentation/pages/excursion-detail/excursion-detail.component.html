@@ -1,22 +1,22 @@
 <div class="page">
-  <a class="back-link" routerLink="/reports">← Excursiones</a>
+  <a class="back-link" routerLink="/reports">{{ "excursion.back" | t }}</a>
 
   @switch (state().status) {
     @case ("loading") {
       <div class="panel skeleton" aria-busy="true">
         <span></span><span></span><span></span><span></span>
-        <p class="sr-only">Cargando excursión…</p>
+        <p class="sr-only">{{ "excursion.loading" | t }}</p>
       </div>
     }
     @case ("error") {
       <div class="panel state" role="alert">
-        <h2>No se pudo cargar la excursión</h2>
+        <h2>{{ "excursion.error.title" | t }}</h2>
         <p>
-          Puede que ya no exista o que el servicio no haya respondido. Vuelve a
-          intentarlo o regresa a la lista.
+          {{ "zone.error.text" | t }}
         </p>
         <button class="button primary compact" type="button" (click)="load()">
-          Reintentar
+          {{ "common.retry" | t }}
+
         </button>
       </div>
     }
@@ -35,27 +35,27 @@
 
         <div class="stat-grid">
           <div class="stat">
-            <strong>{{ excursion.peak }}</strong><span>Valor pico</span>
+            <strong>{{ excursion.peak }}</strong><span>{{ "excursion.peak" | t }}</span>
           </div>
           <div class="stat">
             <strong>{{ excursion.limit }}</strong
-            ><span>{{ excursion.limitLabel }}</span>
+            ><span>{{ excursion.limitLabel | t }}</span>
           </div>
           <div class="stat">
             <strong>{{ excursion.duration }}</strong
-            ><span>{{ excursion.ongoing ? "Duración hasta ahora" : "Duración" }}</span>
+            ><span>{{ (excursion.ongoing ? "excursion.durationSoFar" : "excursion.duration") | t }}</span>
           </div>
           <div class="stat">
-            <strong>{{ excursion.severity }}</strong><span>Severidad</span>
+            <strong>{{ excursion.severity }}</strong><span>{{ "reports.col.severity" | t }}</span>
           </div>
         </div>
 
         <section class="section">
           <div>
-            <h2>Historial de mediciones</h2>
+            <h2>{{ "excursion.history.title" | t }}</h2>
             @if (excursion.range) {
               <p class="lead">
-                Rango seguro actual de la zona:
+                {{ "excursion.history.range" | t }}
                 <span class="mono">{{ excursion.range }}</span>
               </p>
             }
@@ -64,27 +64,27 @@
             <div class="callout error" role="alert">
               <app-icon name="error" />
               <span class="grow"
-                >No se pudo leer el historial de mediciones. El resto de la
-                excursión sí está disponible.</span
+                >{{ "excursion.history.unavailable" | t }}</span
               >
               <button class="button compact" type="button" (click)="load()">
-                Reintentar
+                {{ "common.retry" | t }}
+
               </button>
             </div>
           } @else if (excursion.measurements.length === 0) {
             <div class="panel state">
-              <p>No hay mediciones registradas en el período de la excursión.</p>
+              <p>{{ "excursion.history.empty" | t }}</p>
             </div>
           } @else {
             <div class="panel table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th scope="col">Hora</th>
-                    <th scope="col">Punto</th>
-                    <th scope="col">Valor</th>
-                    <th scope="col"><span class="sr-only">Magnitud</span></th>
-                    <th scope="col">Condición</th>
+                    <th scope="col">{{ "excursion.col.time" | t }}</th>
+                    <th scope="col">{{ "zone.col.point" | t }}</th>
+                    <th scope="col">{{ "excursion.col.value" | t }}</th>
+                    <th scope="col"><span class="sr-only">{{ "excursion.col.magnitude" | t }}</span></th>
+                    <th scope="col">{{ "excursion.col.condition" | t }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -100,7 +100,7 @@
                       </td>
                       <td>
                         <app-status-badge
-                          [label]="row.out ? 'Fuera de rango' : 'Normal'"
+                          [label]="(row.out ? 'status.OUT_OF_RANGE' : 'status.NORMAL') | t"
                           [tone]="row.out ? 'out-of-range' : 'normal'"
                         />
                       </td>
@@ -114,10 +114,10 @@
 
         <div class="range-grid">
           <section class="panel range-card">
-            <h2>No conformidades</h2>
+            <h2>{{ "excursion.nc.title" | t }}</h2>
             @if (excursion.nonConformities.length === 0) {
               <p class="muted">
-                Ningún lote registrado como afectado por esta excursión.
+                {{ "excursion.nc.empty" | t }}
               </p>
             } @else {
               @for (item of excursion.nonConformities; track item.id) {
@@ -133,24 +133,23 @@
             @if (canEdit()) {
               <div>
                 <button class="button compact" type="button" (click)="openForm()">
-                  Registrar no conformidad
+                  {{ "excursion.nc.register" | t }}
+
                 </button>
               </div>
             }
           </section>
           <section class="panel range-card">
-            <h2>Incidente y acción correctiva</h2>
+            <h2>{{ "excursion.incident.title" | t }}</h2>
             @if (excursion.hasIncident) {
-              <p>{{ excursion.correctiveAction || "Sin acción correctiva registrada." }}</p>
+              <p>{{ excursion.correctiveAction || ("excursion.incident.noAction" | t) }}</p>
             } @else if (excursion.ongoing) {
               <p class="muted">
-                Sin incidente vinculado. La excursión sigue abierta hasta que las
-                mediciones vuelvan al rango seguro.
+                {{ "excursion.incident.ongoing" | t }}
               </p>
             } @else {
               <p class="muted">
-                Sin incidente vinculado. La excursión se cerró cuando las
-                mediciones volvieron al rango seguro.
+                {{ "excursion.incident.closed" | t }}
               </p>
             }
           </section>
@@ -161,15 +160,15 @@
 </div>
 
 @if (registering()) {
-  <app-modal heading="Registrar no conformidad" (closed)="registering.set(false)">
+  <app-modal [heading]="'excursion.nc.register' | t" (closed)="registering.set(false)">
     <form class="form" [formGroup]="form" (ngSubmit)="register()" novalidate>
       @if (formError(); as message) {
         <p class="callout error" role="alert">
-          <app-icon name="error" /><span class="grow">{{ message }}</span>
+          <app-icon name="error" /><span class="grow">{{ message | t }}</span>
         </p>
       }
       <div class="field">
-        <label for="nc-batch">Código de lote</label>
+        <label for="nc-batch">{{ "excursion.nc.batch" | t }}</label>
         <input
           id="nc-batch"
           class="mono"
@@ -179,32 +178,33 @@
           [attr.aria-invalid]="submitted() && form.controls.batchCode.invalid"
         />
         @if (submitted() && form.controls.batchCode.invalid) {
-          <p class="field-error" role="alert">Ingresa el código del lote afectado.</p>
+          <p class="field-error" role="alert">{{ "excursion.nc.batchError" | t }}</p>
         }
       </div>
       <div class="field">
-        <label for="nc-product">Producto <em>(opcional)</em></label>
+        <label for="nc-product">{{ "excursion.nc.product" | t }} <em>{{ "common.optional" | t }}</em></label>
         <input id="nc-product" formControlName="productName" autocomplete="off" />
       </div>
       <div class="field">
-        <label for="nc-class">Clasificación</label>
+        <label for="nc-class">{{ "excursion.nc.classification" | t }}</label>
         <input
           id="nc-class"
           formControlName="classification"
-          placeholder="Ruptura de cadena de frío"
+          [placeholder]="'excursion.nc.classPlaceholder' | t"
           autocomplete="off"
           [attr.aria-invalid]="submitted() && form.controls.classification.invalid"
         />
         @if (submitted() && form.controls.classification.invalid) {
-          <p class="field-error" role="alert">Indica el tipo de no conformidad.</p>
+          <p class="field-error" role="alert">{{ "excursion.nc.classError" | t }}</p>
         }
       </div>
       <div class="form-actions">
         <button class="button" type="button" (click)="registering.set(false)">
-          Cancelar
+          {{ "common.cancel" | t }}
+
         </button>
         <button class="button primary" type="submit" [disabled]="saving()">
-          {{ saving() ? "Guardando…" : "Registrar" }}
+          {{ (saving() ? "common.saving" : "zone.sensor.save") | t }}
         </button>
       </div>
     </form>

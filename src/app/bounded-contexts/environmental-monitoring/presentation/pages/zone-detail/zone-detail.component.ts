@@ -2,12 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
+import { I18nService } from '../../../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { SessionService } from '../../../../iam/application/services/session.service';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { StatusBadgeComponent, StatusTone } from '../../../../../shared/components/status-badge/status-badge.component';
 import { LoadState, loadInto } from '../../../../../shared/format/load-state';
-import { formatElapsed, formatValue, saveErrorMessage, VARIABLES } from '../../../../../shared/format/presentation';
+import { formatValue, saveErrorKey, UNITS } from '../../../../../shared/format/presentation';
 import { MonitoringApiClient } from '../../../infrastructure/api/monitoring-api.client';
 import { EnvironmentalVariableDto, MonitoringZoneDto } from '../../../infrastructure/api/monitoring-zone.dto';
 
@@ -17,16 +19,12 @@ type Dialog =
   | { kind: 'sensor'; pointId: string; pointName: string };
 
 const DECIMAL = /^-?\d{1,4}([.,]\d{1,2})?$/;
-const SENSOR_STATUS: Record<string, { label: string; tone: StatusTone }> = {
-  ONLINE: { label: 'En línea', tone: 'normal' },
-  OFFLINE: { label: 'Sin conexión', tone: 'offline' },
-  INACTIVE: { label: 'Inactivo', tone: 'offline' },
-};
+const SENSOR_TONE: Record<string, StatusTone> = { ONLINE: 'normal', OFFLINE: 'offline', INACTIVE: 'offline' };
 
 @Component({
   selector: 'app-zone-detail',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
   templateUrl: './zone-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,6 +33,7 @@ export class ZoneDetailComponent {
   private readonly zoneId = inject(ActivatedRoute).snapshot.paramMap.get('zoneId') ?? '';
   private readonly session = inject(SessionService).session;
   private readonly forms = inject(FormBuilder).nonNullable;
+  private readonly i18n = inject(I18nService);
 
   readonly state = signal<LoadState<MonitoringZoneDto>>({ status: 'loading' });
   readonly canEdit = computed(() => this.session()?.user.role === 'ADMIN');
@@ -49,10 +48,11 @@ export class ZoneDetailComponent {
       const latest = zone?.latestMeasurements.find((m) => m.environmentalVariable === variable);
       return {
         variable,
-        ...VARIABLES[variable],
+        label: this.i18n.t(`variable.${variable}`),
+        unit: UNITS[variable],
         range: threshold ? `${formatValue(threshold.minimumValue)} – ${formatValue(threshold.maximumValue)}` : null,
         threshold,
-        latest: latest ? `${formatValue(latest.measuredValue)} ${VARIABLES[variable].unit}` : null,
+        latest: latest ? `${formatValue(latest.measuredValue)} ${UNITS[variable]}` : null,
       };
     });
   });
@@ -63,8 +63,8 @@ export class ZoneDetailComponent {
       return {
         point,
         sensor,
-        status: sensor ? SENSOR_STATUS[sensor.status] : null,
-        lastSeen: formatElapsed(sensor?.lastMeasurementAt ?? null),
+        status: sensor ? { label: this.i18n.t(`zone.sensor.${sensor.status}`), tone: SENSOR_TONE[sensor.status] } : null,
+        lastSeen: this.i18n.elapsed(sensor?.lastMeasurementAt ?? null),
       };
     });
   });
@@ -108,7 +108,7 @@ export class ZoneDetailComponent {
   }
 
   variableLabel(variable: EnvironmentalVariableDto): string {
-    return `${VARIABLES[variable].label} (${VARIABLES[variable].unit})`;
+    return `${this.i18n.t(`variable.${variable}`)} (${UNITS[variable]})`;
   }
 
   /** True when both bounds parse but are not an increasing range. */
@@ -124,8 +124,12 @@ export class ZoneDetailComponent {
     const range = { minimumValue: toNumber(minimum), maximumValue: toNumber(maximum) };
     this.save(
       this.api.configureThreshold(this.zoneId, variable, range),
-      `Rango de ${VARIABLES[variable].label.toLowerCase()} guardado: ${formatValue(range.minimumValue)} – ${formatValue(range.maximumValue)} ${VARIABLES[variable].unit}`,
-      'El mínimo debe ser menor que el máximo.',
+      () =>
+        this.i18n.t('zone.range.saved', {
+          variable: this.i18n.t(`variable.short.${variable}`).toLowerCase(),
+          range: `${formatValue(range.minimumValue)} – ${formatValue(range.maximumValue)} ${UNITS[variable]}`,
+        }),
+      'zone.range.inverted',
     );
   }
 
@@ -135,8 +139,8 @@ export class ZoneDetailComponent {
     const { name, location } = this.pointForm.getRawValue();
     this.save(
       this.api.registerPoint(this.zoneId, { name: name.trim(), location: location.trim() || null }),
-      `Punto "${name.trim()}" agregado.`,
-      'No se pudo agregar el punto.',
+      () => this.i18n.t('zone.point.saved', { name: name.trim() }),
+      'zone.point.conflict',
     );
   }
 
@@ -146,12 +150,12 @@ export class ZoneDetailComponent {
     const { deviceCode, interval } = this.sensorForm.getRawValue();
     this.save(
       this.api.registerSensor(this.zoneId, pointId, { deviceCode: deviceCode.trim(), samplingIntervalSeconds: Number(interval) }),
-      `Sensor ${deviceCode.trim()} registrado.`,
-      'Ya existe un sensor con este código. Verifica la etiqueta del nodo.',
+      () => this.i18n.t('zone.sensor.saved', { code: deviceCode.trim() }),
+      'zone.sensor.conflict',
     );
   }
 
-  private save(request: Observable<unknown>, confirmation: string, conflict: string): void {
+  private save(request: Observable<unknown>, confirmation: () => string, conflictKey: string): void {
     if (this.saving()) return;
     this.saving.set(true);
     this.formError.set(null);
@@ -159,12 +163,12 @@ export class ZoneDetailComponent {
       next: () => {
         this.saving.set(false);
         this.dialog.set(null);
-        this.saved.set(confirmation);
+        this.saved.set(confirmation());
         this.load();
       },
       error: (error: unknown) => {
         this.saving.set(false);
-        this.formError.set(saveErrorMessage(error, conflict));
+        this.formError.set(saveErrorKey(error, conflictKey));
       },
     });
   }
