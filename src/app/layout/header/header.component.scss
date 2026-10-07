@@ -41,27 +41,6 @@ select {
   align-items: center;
   gap: 16px;
 }
-.language {
-  display: flex;
-  border-radius: 999px;
-  background: #e4f1fb;
-  padding: 4px;
-}
-.language button {
-  border: 0;
-  color: var(--muted);
-  background: transparent;
-  border-radius: 999px;
-  min-height: 32px;
-  min-width: 32px;
-  font-size: 11px;
-}
-.language button.selected {
-  background: white;
-  color: var(--primary);
-  font-weight: 600;
-  box-shadow: 0 1px 3px #0b1f2a12;
-}
 .divider {
   width: 1px;
   height: 32px;

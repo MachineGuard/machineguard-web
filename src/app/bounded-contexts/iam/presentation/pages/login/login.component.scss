@@ -44,7 +44,6 @@ h1 {
   margin: 0 0 8px;
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.01em;
 }
 .lead {
   margin: 0 0 32px;
@@ -59,7 +58,7 @@ label {
 .lead + label {
   margin-top: 0;
 }
-.field {
+.control {
   display: flex;
   align-items: center;
   min-height: 48px;
@@ -69,12 +68,12 @@ label {
   background: #eaf5fc;
   color: var(--muted);
 }
-.field:focus-within {
+.control:focus-within {
   border-color: var(--primary);
   outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
-.field.invalid {
+.control.invalid {
   border-color: var(--error);
 }
 input {
@@ -139,6 +138,7 @@ input::placeholder {
 }
 footer {
   display: flex;
+  align-items: center;
   gap: 12px;
   margin-top: 32px;
   color: var(--muted);

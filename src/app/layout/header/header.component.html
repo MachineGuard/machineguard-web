@@ -18,17 +18,7 @@
       </select>
     </div>
     <div class="header-actions">
-      <div class="language" role="group" [attr.aria-label]="'header.language' | t">
-        <button
-          [class.selected]="language() === 'en'" (click)="useLanguage('en')" [attr.aria-pressed]="language() === 'en'" [attr.aria-label]="'header.english' | t"
-        >
-          EN</button
-        ><button
-          [class.selected]="language() === 'es'" (click)="useLanguage('es')" [attr.aria-pressed]="language() === 'es'" [attr.aria-label]="'header.spanish' | t"
-        >
-          ES
-        </button>
-      </div>
+      <app-language-switch />
       <div class="popover-anchor">
         <button
           class="icon-button notification-button"
