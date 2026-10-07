@@ -152,6 +152,28 @@ select {
 .popover a {
   color: var(--primary);
 }
+.sign-out {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+.sign-out:hover {
+  background: var(--primary-container);
+}
+.sign-out app-icon {
+  width: 16px;
+  height: 16px;
+}
 .text-action {
   display: flex;
   align-items: center;

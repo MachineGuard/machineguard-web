@@ -63,7 +63,7 @@
       <div class="popover-anchor">
         <button
           class="user-button"
-          aria-label="User preview"
+          aria-label="Account menu"
           [attr.aria-expanded]="menuOpen()"
           (click)="menuOpen.set(!menuOpen()); notificationsOpen.set(false)"
         >
@@ -73,11 +73,16 @@
         </button>
         @if (menuOpen()) {
           <div class="popover">
-            <strong>Preview workspace</strong>
-            <p>
-              This profile is mock presentation data. Authentication has not
-              been connected.
-            </p>
+            @if (session(); as current) {
+              <strong>{{ current.user.fullName }}</strong>
+              <p>{{ current.user.email }}</p>
+              <button class="sign-out" (click)="signOut()">
+                <app-icon name="logout" />Sign out
+              </button>
+            } @else {
+              <strong>Preview workspace</strong>
+              <p>This profile is mock presentation data.</p>
+            }
           </div>
         }
       </div>

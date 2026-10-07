@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { authGuard, guestGuard } from './bounded-contexts/iam/presentation/guards/auth.guard';
 
 const placeholder = () =>
   import(
@@ -7,8 +8,18 @@ const placeholder = () =>
   ).then((m) => m.FeaturePlaceholderComponent);
 export const routes: Routes = [
   {
+    path: 'login',
+    canActivate: [guestGuard],
+    title: 'MachineGuard | Iniciar sesión',
+    loadComponent: () =>
+      import(
+        './bounded-contexts/iam/presentation/pages/login/login.component'
+      ).then((m) => m.LoginComponent),
+  },
+  {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {
