@@ -16,7 +16,7 @@
       }
 
       <label for="email">{{ "login.email" | t }}</label>
-      <div class="field" [class.invalid]="invalid('email')">
+      <div class="control" [class.invalid]="invalid('email')">
         <input
           id="email"
           type="email"
@@ -38,7 +38,7 @@
       }
 
       <label for="password">{{ "login.password" | t }}</label>
-      <div class="field" [class.invalid]="invalid('password')">
+      <div class="control" [class.invalid]="invalid('password')">
         <input
           id="password"
           [type]="passwordVisible() ? 'text' : 'password'"
@@ -74,7 +74,7 @@
     <footer>
       <span>{{ "common.terms" | t }}</span><span aria-hidden="true">&middot;</span
       ><span>{{ "common.privacy" | t }}</span><span aria-hidden="true">&middot;</span
-      ><span>MachineGuard</span>
+      ><app-language-switch />
     </footer>
   </main>
 </div>

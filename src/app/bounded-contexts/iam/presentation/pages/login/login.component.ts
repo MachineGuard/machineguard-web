@@ -1,3 +1,4 @@
+import { LanguageSwitchComponent } from '../../../../../shared/components/language-switch/language-switch.component';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,7 +11,7 @@ import { SessionService } from '../../../application/services/session.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, LoginShowcaseComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, IconComponent, LoginShowcaseComponent, TranslatePipe, LanguageSwitchComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
