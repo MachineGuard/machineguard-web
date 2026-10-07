@@ -16,7 +16,7 @@ function measurementStatus(value: number, threshold: Threshold): ZoneStatus {
     : 'NORMAL';
 }
 
-/** Read projection: last measurement per variable from currently online points. */
+/** Read projection: Core supplies zone state; mocks derive state from online points and thresholds. */
 export function toMonitoringZoneViewModel(
   zone: MonitoringZone,
   snapshot: MonitoringSnapshot,
@@ -33,7 +33,9 @@ export function toMonitoringZoneViewModel(
     .filter(
       (m) =>
         m.monitoringZoneId === zone.id &&
-        onlinePointIds.has(m.monitoringPointId),
+        (zone.reportedStatus
+          ? zone.reportedStatus !== 'OFFLINE'
+          : onlinePointIds.has(m.monitoringPointId)),
     )
     .sort((a, b) => Date.parse(b.recordedAt) - Date.parse(a.recordedAt));
   const temperature = measurements.find(
@@ -48,7 +50,8 @@ export function toMonitoringZoneViewModel(
   const temperatureRange = thresholds.find(
     (t) => t.environmentalVariable === 'TEMPERATURE',
   )?.safeRange;
-  const deviation = [temperature, humidity].find((m) => {
+  const candidates = zone.reportedStatus ? measurements : [temperature, humidity];
+  const deviation = candidates.find((m) => {
     if (!m) return false;
     const threshold = thresholds.find(
       (t) => t.environmentalVariable === m.environmentalVariable,
@@ -84,13 +87,19 @@ export function toMonitoringZoneViewModel(
         ? measurementStatus(m.measuredValue, threshold)
         : 'NORMAL';
     });
-  const status: ZoneStatus = !online.length
-    ? 'OFFLINE'
-    : statuses.includes('OUT_OF_RANGE')
-      ? 'OUT_OF_RANGE'
-      : statuses.includes('NEAR_LIMIT')
-        ? 'NEAR_LIMIT'
-        : 'NORMAL';
+  const status: ZoneStatus = zone.reportedStatus ?? (
+    !online.length
+      ? 'OFFLINE'
+      : statuses.includes('OUT_OF_RANGE')
+        ? 'OUT_OF_RANGE'
+        : statuses.includes('NEAR_LIMIT')
+          ? 'NEAR_LIMIT'
+          : 'NORMAL'
+  );
+  const lastSeenTimes = nodes
+    .map(node => node.lastSeenAt)
+    .filter((time): time is string => !!time)
+    .sort((a, b) => Date.parse(b) - Date.parse(a));
   return {
     ...zone,
     temperature: temperature?.measuredValue ?? null,
@@ -98,24 +107,21 @@ export function toMonitoringZoneViewModel(
     status,
     minTemperature: temperatureRange?.min,
     maxTemperature: temperatureRange?.max,
-    onlineNodes: online.length,
-    offlineNodes: nodes.length - online.length,
-    lastUpdated: measurements[0]?.recordedAt,
+    onlineNodes: zone.sensorCounts?.online ?? online.length,
+    offlineNodes: zone.sensorCounts?.offline ??
+      nodes.filter(node => node.status === 'OFFLINE').length,
+    lastUpdated: zone.lastUpdatedAt ?? measurements[0]?.recordedAt,
     deviationNote,
     pointNames: snapshot.points
       .filter((p) => pointIds.has(p.id))
       .map((p) => p.name),
-    lastSeenAt: nodes
-      .map((n) => n.lastSeenAt)
-      .sort((a, b) => Date.parse(b) - Date.parse(a))[0],
+    lastSeenAt: lastSeenTimes[0],
     offlineMinutes:
-      !online.length && nodes.length
+      !online.length && lastSeenTimes.length
         ? Math.max(
             0,
             Math.floor(
-              (Date.now() -
-                Math.max(...nodes.map((n) => Date.parse(n.lastSeenAt)))) /
-                60000,
+              (Date.now() - Date.parse(lastSeenTimes[0])) / 60000,
             ),
           )
         : undefined,
@@ -130,7 +136,7 @@ export function toMonitoringZoneViewModel(
         : undefined,
     temperatureTrend: measurements
       .filter((m) => m.environmentalVariable === 'TEMPERATURE')
-      .slice(0, 6)
+      .slice(0, zone.reportedStatus ? 1 : 6)
       .reverse()
       .map((m) => {
         const threshold = thresholds.find(
