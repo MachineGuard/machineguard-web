@@ -1,0 +1,342 @@
+// Shared building blocks of the management pages (zones, excursions).
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.page h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  color: var(--primary);
+}
+.page h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.page .lead {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.panel.padded {
+  padding: 24px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.data-table th {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+}
+.data-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.data-table tr:last-child td {
+  border-bottom: 0;
+}
+.data-table th:first-child,
+.data-table td:first-child {
+  padding-left: 24px;
+}
+.data-table th:last-child,
+.data-table td:last-child {
+  padding-right: 24px;
+}
+.data-table td small,
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+.data-table td small {
+  display: block;
+  margin-top: 4px;
+}
+.row-link {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.row-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.align-end {
+  text-align: right;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.stat {
+  padding: 16px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.stat strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 500;
+}
+.stat span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.callout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--primary-container);
+  font-size: 13px;
+  line-height: 20px;
+}
+.callout app-icon {
+  color: var(--primary);
+}
+.callout.error {
+  background: #fdecee;
+}
+.callout.error app-icon {
+  color: var(--error);
+}
+.callout .grow {
+  flex: 1 1 240px;
+}
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 40px 32px;
+}
+.state p {
+  margin: 0;
+  max-width: 520px;
+  color: var(--muted);
+  line-height: 22px;
+}
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+.skeleton span {
+  height: 14px;
+  border-radius: 999px;
+  background: var(--border);
+}
+.skeleton span:nth-child(2) {
+  width: 62%;
+}
+.skeleton span:nth-child(3) {
+  width: 48%;
+}
+.skeleton span:nth-child(4) {
+  width: 70%;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.field label,
+.filters label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.field label em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 400;
+}
+.field input,
+.filters select {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid #c9dfe7;
+  border-radius: 8px;
+  background: #eaf5fc;
+  color: var(--text);
+  font-size: 14px;
+}
+.field input:focus-visible,
+.filters select:focus-visible {
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+.field input.mono {
+  font-family: var(--font-mono);
+}
+.field input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.field-error {
+  margin: 0;
+  color: #a51c2a;
+  font-size: 12px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+.filters > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.filters select {
+  min-height: 44px;
+  background: var(--surface);
+  font-size: 13px;
+}
+.modal {
+  width: min(480px, calc(100vw - 32px));
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 16px 48px rgb(11 31 42 / 24%);
+}
+.modal::backdrop {
+  background: rgb(11 31 42 / 45%);
+}
+.modal h2 {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.range-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.range-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+.range-card.pending {
+  border-color: var(--warning);
+  box-shadow: none;
+}
+.range-card header,
+.range-card footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+.range-card footer {
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.range-value {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+}
+.range-value small {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.meter {
+  height: 8px;
+  min-width: 120px;
+  border-radius: 999px;
+  background: #ecf0f3;
+  overflow: hidden;
+}
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ok);
+}
+.meter.out span {
+  background: var(--error);
+}
+.button.compact {
+  min-height: 44px;
+  padding: 8px 20px;
+}

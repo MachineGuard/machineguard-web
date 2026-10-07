@@ -1,0 +1,156 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1>Zonas</h1>
+      <p class="lead">
+        Zonas de monitoreo, puntos, sensores y rangos seguros de tu
+        organización.
+      </p>
+    </div>
+    @if (canEdit() && rows().length) {
+      <button class="button primary" type="button" (click)="openForm()">
+        <app-icon name="plus" />Nueva zona
+      </button>
+    }
+  </div>
+
+  @switch (state().status) {
+    @case ("loading") {
+      <div class="panel skeleton" aria-busy="true">
+        <span></span><span></span><span></span><span></span>
+        <p class="sr-only">Cargando zonas…</p>
+      </div>
+    }
+    @case ("error") {
+      <div class="panel state" role="alert">
+        <h2>No se pudieron cargar las zonas</h2>
+        <p>
+          El servicio no respondió. Tus datos no se perdieron; vuelve a
+          intentarlo en unos segundos.
+        </p>
+        <button class="button primary compact" type="button" (click)="load()">
+          Reintentar
+        </button>
+      </div>
+    }
+    @case ("ready") {
+      @if (rows().length === 0) {
+        <div class="panel state">
+          <h2>Aún no hay zonas de monitoreo</h2>
+          <p>
+            Crea la zona, agrega un punto de monitoreo y define el rango seguro
+            de cada variable. Con eso la zona empieza a recibir mediciones.
+          </p>
+          @if (canEdit()) {
+            <button class="button primary" type="button" (click)="openForm()">
+              <app-icon name="plus" />Crear primera zona
+            </button>
+          } @else {
+            <p>Pide a un administrador que configure la primera zona.</p>
+          }
+        </div>
+      } @else {
+        <div class="stat-grid">
+          <div class="stat">
+            <strong>{{ rows().length }}</strong><span>Zonas registradas</span>
+          </div>
+          <div class="stat">
+            <strong>{{ readyCount() }}</strong
+            ><span>Listas para recibir mediciones</span>
+          </div>
+          <div class="stat">
+            <strong>{{ rows().length - readyCount() }}</strong
+            ><span>Con configuración pendiente</span>
+          </div>
+        </div>
+        <div class="panel table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Zona</th>
+                <th scope="col">Configuración</th>
+                <th scope="col">Puntos</th>
+                <th scope="col">Sensores</th>
+                <th scope="col">Rangos seguros</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.zone.id) {
+                <tr>
+                  <td>
+                    <a class="row-link" [routerLink]="['/zones', row.zone.id]">{{
+                      row.zone.name
+                    }}</a>
+                    <small>{{ row.zone.description || "Sin descripción" }}</small>
+                  </td>
+                  <td>
+                    <app-status-badge
+                      [label]="row.setup.label"
+                      [tone]="row.setup.tone"
+                    />
+                  </td>
+                  <td class="mono">{{ row.zone.points.length }}</td>
+                  <td class="mono">{{ row.zone.sensors.length }}</td>
+                  <td class="mono">{{ row.ranges }}</td>
+                  <td class="align-end">
+                    <a class="back-link" [routerLink]="['/zones', row.zone.id]">{{
+                      canEdit() ? "Configurar" : "Ver"
+                    }}</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  }
+</div>
+
+@if (creating()) {
+  <app-modal heading="Nueva zona" (closed)="creating.set(false)">
+    <form class="form" [formGroup]="form" (ngSubmit)="create()" novalidate>
+      @if (formError(); as message) {
+        <p class="callout error" role="alert">
+          <app-icon name="error" /><span class="grow">{{ message }}</span>
+        </p>
+      }
+      <div class="field">
+        <label for="zone-name">Nombre</label>
+        <input
+          id="zone-name"
+          formControlName="name"
+          placeholder="Cámara fría A"
+          autocomplete="off"
+          [attr.aria-invalid]="submitted() && form.controls.name.invalid"
+          [attr.aria-describedby]="
+            submitted() && form.controls.name.invalid ? 'zone-name-error' : null
+          "
+        />
+        @if (submitted() && form.controls.name.invalid) {
+          <p class="field-error" id="zone-name-error">
+            Ingresa un nombre para la zona.
+          </p>
+        }
+      </div>
+      <div class="field">
+        <label for="zone-description">Descripción <em>(opcional)</em></label>
+        <input
+          id="zone-description"
+          formControlName="description"
+          placeholder="Almacén de lácteos"
+          autocomplete="off"
+        />
+      </div>
+      <div class="form-actions">
+        <button class="button" type="button" (click)="creating.set(false)">
+          Cancelar
+        </button>
+        <button class="button primary" type="submit" [disabled]="saving()">
+          {{ saving() ? "Creando…" : "Crear zona" }}
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}

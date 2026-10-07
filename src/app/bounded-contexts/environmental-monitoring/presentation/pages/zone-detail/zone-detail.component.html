@@ -1,0 +1,357 @@
+<div class="page">
+  <a class="back-link" routerLink="/zones">← Zonas</a>
+
+  @switch (state().status) {
+    @case ("loading") {
+      <div class="panel skeleton" aria-busy="true">
+        <span></span><span></span><span></span><span></span>
+        <p class="sr-only">Cargando zona…</p>
+      </div>
+    }
+    @case ("error") {
+      <div class="panel state" role="alert">
+        <h2>No se pudo cargar la zona</h2>
+        <p>
+          Puede que ya no exista o que el servicio no haya respondido. Vuelve a
+          intentarlo o regresa a la lista.
+        </p>
+        <button class="button primary compact" type="button" (click)="load()">
+          Reintentar
+        </button>
+      </div>
+    }
+    @case ("ready") {
+      @if (zone(); as current) {
+        <div>
+          <div class="title-row">
+            <h1>{{ current.name }}</h1>
+            <app-status-badge
+              [label]="current.status === 'ACTIVE' ? 'Activa' : 'Inactiva'"
+              [tone]="current.status === 'ACTIVE' ? 'normal' : 'offline'"
+            />
+          </div>
+          <p class="lead">{{ current.description || "Sin descripción" }}</p>
+        </div>
+
+        @if (saved(); as message) {
+          <p class="callout" role="status">
+            <app-icon name="check-circle" /><span class="grow">{{ message }}</span>
+          </p>
+        }
+        @if (!canEdit()) {
+          <p class="callout">
+            <app-icon name="eye" /><span class="grow"
+              >Tu rol es Lector: puedes consultar la zona, no modificarla.</span
+            >
+          </p>
+        }
+
+        <section class="section">
+          <div>
+            <h2>Rangos seguros</h2>
+            <p class="lead">
+              Una medición fuera del rango abre una excursión en Reportes.
+            </p>
+          </div>
+          <div class="range-grid">
+            @for (item of ranges(); track item.variable) {
+              <article class="panel range-card" [class.pending]="!item.range">
+                <header>
+                  <strong>{{ item.label }}</strong>
+                  <app-status-badge
+                    [label]="item.range ? 'Configurado' : 'Sin configurar'"
+                    [tone]="item.range ? 'normal' : 'near-limit'"
+                  />
+                </header>
+                <div class="range-value">
+                  {{ item.range ?? "— – —" }}<small>{{ item.unit }}</small>
+                </div>
+                <footer>
+                  @if (item.range) {
+                    <span class="muted"
+                      >Última lectura
+                      <span class="mono">{{ item.latest ?? "—" }}</span></span
+                    >
+                  } @else {
+                    <span
+                      >Las mediciones de esta variable se rechazan hasta definir
+                      el rango.</span
+                    >
+                  }
+                  @if (canEdit()) {
+                    <button
+                      class="button compact"
+                      [class.primary]="!item.range"
+                      type="button"
+                      (click)="open({ kind: 'threshold', variable: item.variable })"
+                    >
+                      {{ item.range ? "Editar rango" : "Definir rango" }}
+                    </button>
+                  }
+                </footer>
+              </article>
+            }
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="page-head">
+            <div>
+              <h2>Puntos de monitoreo</h2>
+              <p class="lead">Cada punto puede tener un sensor asociado.</p>
+            </div>
+            @if (canEdit()) {
+              <button
+                class="button compact"
+                type="button"
+                (click)="open({ kind: 'point' })"
+              >
+                <app-icon name="plus" />Agregar punto
+              </button>
+            }
+          </div>
+          @if (points().length === 0) {
+            <div class="panel state">
+              <h2>Esta zona aún no tiene puntos</h2>
+              <p>
+                Agrega al menos un punto de monitoreo para poder registrar
+                mediciones.
+              </p>
+            </div>
+          } @else {
+            <div class="panel table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Punto</th>
+                    <th scope="col">Sensor</th>
+                    <th scope="col">Intervalo</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Última medición</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of points(); track row.point.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ row.point.name }}</strong>
+                        <small>{{ row.point.location || "Sin ubicación" }}</small>
+                      </td>
+                      @if (row.sensor; as sensor) {
+                        <td class="mono">{{ sensor.deviceCode }}</td>
+                        <td class="mono">{{ sensor.samplingIntervalSeconds }} s</td>
+                        <td>
+                          <app-status-badge
+                            [label]="row.status!.label"
+                            [tone]="row.status!.tone"
+                          />
+                        </td>
+                        <td class="muted">{{ row.lastSeen }}</td>
+                      } @else {
+                        <td colspan="3" class="muted">Sin sensor registrado</td>
+                        <td class="align-end">
+                          @if (canEdit()) {
+                            <button
+                              class="button compact"
+                              type="button"
+                              (click)="
+                                open({
+                                  kind: 'sensor',
+                                  pointId: row.point.id,
+                                  pointName: row.point.name,
+                                })
+                              "
+                            >
+                              Registrar sensor
+                            </button>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+    }
+  }
+</div>
+
+@if (dialog(); as active) {
+  @switch (active.kind) {
+    @case ("threshold") {
+      <app-modal
+        [heading]="'Rango seguro · ' + variableLabel(active.variable)"
+        (closed)="dialog.set(null)"
+      >
+        <form
+          class="form"
+          [formGroup]="thresholdForm"
+          (ngSubmit)="saveThreshold(active.variable)"
+          novalidate
+        >
+          @if (formError(); as message) {
+            <p class="callout error" role="alert">
+              <app-icon name="error" /><span class="grow">{{ message }}</span>
+            </p>
+          }
+          <div class="field-row">
+            <div class="field">
+              <label for="range-min">Mínimo</label>
+              <input
+                id="range-min"
+                class="mono"
+                formControlName="minimum"
+                inputmode="decimal"
+                autocomplete="off"
+                aria-describedby="range-help"
+                [attr.aria-invalid]="
+                  submitted() &&
+                  (thresholdForm.controls.minimum.invalid || rangeInverted())
+                "
+              />
+            </div>
+            <div class="field">
+              <label for="range-max">Máximo</label>
+              <input
+                id="range-max"
+                class="mono"
+                formControlName="maximum"
+                inputmode="decimal"
+                autocomplete="off"
+                aria-describedby="range-help"
+                [attr.aria-invalid]="
+                  submitted() &&
+                  (thresholdForm.controls.maximum.invalid || rangeInverted())
+                "
+              />
+            </div>
+          </div>
+          @if (submitted() && thresholdForm.invalid) {
+            <p class="field-error" role="alert">
+              Ingresa ambos valores como números con hasta dos decimales.
+            </p>
+          } @else if (submitted() && rangeInverted()) {
+            <p class="field-error" role="alert">
+              El mínimo debe ser menor que el máximo.
+            </p>
+          }
+          <p class="muted" id="range-help">
+            Hasta dos decimales. Los valores límite cuentan como dentro del
+            rango.
+          </p>
+          <div class="form-actions">
+            <button class="button" type="button" (click)="dialog.set(null)">
+              Cancelar
+            </button>
+            <button class="button primary" type="submit" [disabled]="saving()">
+              {{ saving() ? "Guardando…" : "Guardar rango" }}
+            </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+    @case ("point") {
+      <app-modal heading="Agregar punto" (closed)="dialog.set(null)">
+        <form class="form" [formGroup]="pointForm" (ngSubmit)="savePoint()" novalidate>
+          @if (formError(); as message) {
+            <p class="callout error" role="alert">
+              <app-icon name="error" /><span class="grow">{{ message }}</span>
+            </p>
+          }
+          <div class="field">
+            <label for="point-name">Nombre</label>
+            <input
+              id="point-name"
+              formControlName="name"
+              placeholder="Punto 1"
+              autocomplete="off"
+              [attr.aria-invalid]="submitted() && pointForm.controls.name.invalid"
+            />
+            @if (submitted() && pointForm.controls.name.invalid) {
+              <p class="field-error" role="alert">Ingresa un nombre para el punto.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="point-location">Ubicación <em>(opcional)</em></label>
+            <input
+              id="point-location"
+              formControlName="location"
+              placeholder="Estante B"
+              autocomplete="off"
+            />
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" (click)="dialog.set(null)">
+              Cancelar
+            </button>
+            <button class="button primary" type="submit" [disabled]="saving()">
+              {{ saving() ? "Guardando…" : "Agregar punto" }}
+            </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+    @case ("sensor") {
+      <app-modal
+        [heading]="'Registrar sensor · ' + active.pointName"
+        (closed)="dialog.set(null)"
+      >
+        <form
+          class="form"
+          [formGroup]="sensorForm"
+          (ngSubmit)="saveSensor(active.pointId)"
+          novalidate
+        >
+          @if (formError(); as message) {
+            <p class="callout error" role="alert">
+              <app-icon name="error" /><span class="grow">{{ message }}</span>
+            </p>
+          }
+          <div class="field">
+            <label for="sensor-code">Código del dispositivo</label>
+            <input
+              id="sensor-code"
+              class="mono"
+              formControlName="deviceCode"
+              placeholder="MG-ESP32-001"
+              autocomplete="off"
+              [attr.aria-invalid]="submitted() && sensorForm.controls.deviceCode.invalid"
+            />
+            @if (submitted() && sensorForm.controls.deviceCode.invalid) {
+              <p class="field-error" role="alert">
+                Ingresa el código impreso en el nodo.
+              </p>
+            }
+          </div>
+          <div class="field">
+            <label for="sensor-interval">Intervalo de muestreo (segundos)</label>
+            <input
+              id="sensor-interval"
+              class="mono"
+              formControlName="interval"
+              inputmode="numeric"
+              autocomplete="off"
+              [attr.aria-invalid]="submitted() && sensorForm.controls.interval.invalid"
+            />
+            @if (submitted() && sensorForm.controls.interval.invalid) {
+              <p class="field-error" role="alert">
+                Ingresa un número entero mayor que cero.
+              </p>
+            }
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" (click)="dialog.set(null)">
+              Cancelar
+            </button>
+            <button class="button primary" type="submit" [disabled]="saving()">
+              {{ saving() ? "Guardando…" : "Registrar" }}
+            </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+  }
+}

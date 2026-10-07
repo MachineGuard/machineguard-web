@@ -1,5 +1,9 @@
 # Traceability & Quality
 
-Reserved bounded context for Excursions, Measurement History, Traceability Reports and Non-Conformities.
-Add domain, application, infrastructure and presentation layers when those use cases are implemented.
-The current /reports route uses a shared presentation placeholder; no reporting logic exists yet.
+Excursions and their evidence, read from the Core API (`/api/v1/traceability`).
+
+- `infrastructure/api/excursions-api.client.ts`: excursions, excursion detail, Measurement History and Non-Conformity registration.
+- `presentation/pages/excursions-list`: `/reports`, filterable by zone and status, with a banner per ongoing excursion.
+- `presentation/pages/excursion-detail`: `/reports/excursions/:excursionId`, with peak, breached limit, duration, readings and Non-Conformities.
+
+Traceability Reports (generation, list and download) are not implemented in the web application yet.
