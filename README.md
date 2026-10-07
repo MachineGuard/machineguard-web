@@ -53,7 +53,7 @@ Flujo: componente → DashboardFacade → servicios de aplicación de cada conte
 
 La facade calcula conteos a partir de las zonas y compone el identificador de la alerta reconocible. Los componentes no hacen HTTP ni interpretan DTOs. Las interfaces de repositorio usan `InjectionToken` para seleccionar implementaciones en `app.config.ts`.
 
-## Comportamiento del dashboard
+## Comportamiento del dashboard en modo mock
 
 - Cold Room A: 11.2 °C / 58 %, Out of range, máximo 8 °C.
 - Dry Store: 24.0 °C / 46 %, Normal, rango 15–28 °C.
@@ -67,7 +67,7 @@ La facade calcula conteos a partir de las zonas y compone el identificador de la
 - Facility y EN/ES son selectores de presentación; aún no filtran ni traducen. Los botones de notificaciones y usuario abren paneles de preview. El perfil Alex Morgan proviene de un repositorio mock de IAM, solo para presentación; no crea credenciales ni una identidad autenticada.
 - Grid de cuatro columnas en desktop (desde 1101 px), dos en laptop/tablet y una en móvil. Sidebar plegable bajo 760 px. Latest Alerts usa filas responsive.
 
-## Measurements y reglas provisionales
+## Measurements y reglas del modo mock
 
 `Measurement` conserva `environmentalVariable`, `measuredValue`, zona, punto, organización y fecha. `zone.mapper.ts` selecciona la última medición por variable entre los puntos con nodos online, y crea el read model de temperatura y humedad. Excluye lecturas de puntos totalmente offline.
 
@@ -75,31 +75,109 @@ Los estados usan thresholds de ambas variables: fuera de cualquier rango → Out
 
 La conectividad proviene de `SensorNode.status`, sin timers. Un nodo online sin lecturas muestra un guion; esta iteración no introduce un quinto estado de disponibilidad. La política de mediciones ausentes y obsoletas queda pendiente del contrato real.
 
-## Sustituir los mocks por HTTP
+## Integración HTTP con Environmental Monitoring
 
-1. Confirmar Swagger, DTOs, rutas, paginación, timestamps, reglas de estado y body de reconocimiento.
-2. Implementar DTOs y mappers dentro de `infrastructure/api` de cada contexto. Los clientes actuales son scaffolds inactivos; sus tipos de transporte ilustrativos no afirman un contrato del backend.
-3. Configurar `API_CONFIG` con la URL real. `MonitoringApiClient` no tiene endpoint predefinido: falla explícitamente si no se configura `monitoringSnapshotPath`. Si el backend ofrece endpoints separados, reemplazar la composición interna del cliente; no crear un endpoint snapshot artificial.
-4. Adaptar `ApiMonitoringRepository` y `ApiAlertRepository` a los contratos existentes. Agregar refresco/invalidación al repositorio de alertas tras reconocer para actualizar la lista HTTP. Los componentes y la facade permanecen independientes del transporte.
-5. Cambiar ambos providers en `app.config.ts`, una vez terminados los adaptadores:
+El modo predeterminado usa el Core real: `ApiMonitoringRepository` reemplaza `MockMonitoringRepository` mediante el provider `MONITORING_REPOSITORY` en `app.config.ts`. No hay fallback automático a datos ficticios si falla la API.
 
-```ts
-{ provide: MONITORING_REPOSITORY, useClass: ApiMonitoringRepository },
-{ provide: ALERT_REPOSITORY, useClass: ApiAlertRepository },
+```text
+EnvironmentalDashboardComponent
+→ DashboardFacade
+→ EnvironmentalMonitoringService
+→ MonitoringRepository (contrato)
+→ ApiMonitoringRepository
+→ MonitoringApiClient / ApiClient
+→ HttpClient + interceptor Bearer
+→ GET /api/v1/environmental-monitoring/zones
 ```
 
-Las rutas propuestas de alertas están centralizadas en `alerts-api.client.ts`: `alerts` y `alerts/{id}/acknowledgements`, bajo el base URL. No se hacen llamadas al backend en modo mock. Todavía no hay operaciones HTTP de incidentes ni reportes.
+La API devuelve `MonitoringZoneDto[]`. El mapper `infrastructure/mappers/monitoring-zone.mapper.ts` convierte el contrato REST a `MonitoringSnapshot`; `application/services/zone.mapper.ts` proyecta los `MonitoringZoneViewModel` existentes. Los componentes no conocen los DTOs ni hacen HTTP.
 
-`AuthContextService` empieza con contexto `null`. El futuro IAM suministrará JWT, organización y usuario. El interceptor adjunta `Authorization`, `X-Organization-Id` y `X-User-Id` solo a la API configurada y solo si existen valores. No se guardan tokens ni se inventa una sesión autenticada. El backend debe validar identidad y pertenencia a la organización.
+El estado ambiental y los conteos de nodos son los enviados por Core. HUMIDITY se traduce al vocabulario interno RELATIVE_HUMIDITY; sensores INACTIVE no se cuentan como offline. Las lecturas sensorless siguen siendo válidas. Se muestra la última medición de cada variable por fecha, sin inventar promedios. Si otro punto provoca una desviación, se conserva el estado de zona de Core.
 
-## Validación
+La respuesta de `/zones` trae lecturas actuales, no un historial de seis muestras: el gráfico conserva su estilo y representa una lectura actual. No se inventan barras históricas ni duración de excursión. Los endpoints `/measurements/latest`, `/measurements/history` y `/zones/{id}` quedan disponibles en Core para futuras pantallas; el dashboard requiere solamente una llamada a `/zones`.
 
-- Build de producción con budgets originales, sin errores ni advertencias.
-- 11 pruebas en Chrome Headless: variables, última lectura, puntos offline, excursión de humedad, composición y conteos, reconocimiento sin resolver la desviación, rechazo duplicado y alcance de headers IAM.
-- Smoke test en Chrome: redirección, seis rutas, Add Monitored Point, diálogo, menú móvil y reconocimiento.
-- Layout verificado en 1440, 1024, 768 y 390 px, sin overflow horizontal de la página; cero errores de ejecución y cero solicitudes `/api/v1`.
+La UI original tiene cuatro estados. NO_DATA reutiliza la representación OFFLINE, con valores nulos; no se agrega un quinto badge ni se cambia el diseño. `lastSeenAt` usa `SensorResource.lastMeasurementAt`; el tiempo offline mostrado es el tiempo desde esa última lectura, no una duración de desconexión confirmada por el backend.
 
-Se sustituyó el template de bienvenida Angular por el router outlet y se adaptó su test. No se recreó el proyecto ni se modificaron las dependencias. No se implementaron backend, autenticación, CRUD, reportes, WebSockets ni deployment.
+`EnvironmentalMonitoringService.state$` expone loading/error/empty/loaded. Dashboard y sidebar comparten la carga mediante shareReplay. Se reutilizan los estados visuales existentes: carga mientras espera, error para fallos HTTP, mensaje vacío cuando no hay zonas y tarjetas cuando hay datos. Para reintentar o cambiar token, recargar la página.
+
+### Configuración y ejecución local
+
+```powershell
+npm install
+npm start
+```
+
+La URL está en `src/environments/environment.ts` (desarrollo HTTP), `environment.production.ts` (producción HTTP) y `environment.mock.ts` (demo). El valor predeterminado es `/api/v1`. `proxy.conf.json` dirige `/api` al Core en `http://localhost:8080` durante `ng serve`, evitando requerir cambios CORS en el backend. Si el Core usa otro puerto, ajustar el proxy. En producción configurar el reverse proxy para el mismo origen o cambiar `apiBaseUrl` a la URL pública correcta y permitir ese origen en el backend.
+
+### JWT temporal de desarrollo
+
+No existe login frontend todavía. Obtener un JWT **real** del IAM del Core, por ejemplo mediante `/api/v1/auth/login` en Swagger. En la consola del navegador del frontend:
+
+```javascript
+sessionStorage.setItem('machineguard.development.jwt', '<JWT_REAL_SIN_PREFIJO_BEARER>');
+location.reload();
+```
+
+El token nunca se configura en el código fuente ni en un environment compilado. Para retirarlo:
+
+```javascript
+sessionStorage.removeItem('machineguard.development.jwt');
+location.reload();
+```
+
+`AccessTokenProvider` es el port de IAM. `ConfiguredAccessTokenProvider` prioriza un JWT del AuthContext real y usa `DevelopmentTokenStore` solo cuando `developmentTokenEnabled` está habilitado. Producción y modo mock lo deshabilitan. Al integrar login real, retirar el fallback o sustituir el provider del port en `app.config.ts`.
+
+El interceptor adjunta únicamente `Authorization: Bearer <JWT>` y solo a la URL/origen/path configurados. No añade `X-Organization-Id` ni `X-User-Id`. Sin token, un 401 se muestra como error de carga; no se inventa una sesión ni se convierten fallos de autenticación en datos demo.
+
+### Modo mock
+
+```powershell
+npm run start:mock
+```
+
+Usa `MockMonitoringRepository` y no realiza solicitudes de monitorización al Core. Las alertas y el perfil del layout siguen siendo mocks: no representan incidentes ni una identidad autenticada reales. La facade muestra únicamente alertas cuyos IDs de zona correspondan a las zonas cargadas; así no mezcla las alertas demo con las zonas UUID de Core. No se implementó una API de Alert & Incident Management.
+
+## Validación de la integración
+
+- `npm run build` ejecuta `ng build` de producción con los budgets originales.
+- 20 pruebas en Chrome Headless: contrato REST, mappers, HUMIDITY, sensores INACTIVE/sin sensor, lecturas offline, NO_DATA, una sola solicitud compartida, loading/error/empty/loaded, Bearer sin headers de identidad, alcance de credenciales y token temporal deshabilitado en producción; además de las pruebas existentes de mocks/composición.
+- Templates, SCSS, fuentes y componentes visuales permanecen intactos. No se modificaron dependencias ni backend.
+- La respuesta HTTP se verificó con HttpTestingController usando el DTO real de Core. El uso contra una instancia real requiere iniciar el Core y configurar un JWT válido.
+
+## Archivos de esta integración HTTP
+
+### Modificados
+
+- `README.md`
+- `angular.json`
+- `package.json`
+- `src/app/app.config.ts`
+- `src/app/bounded-contexts/environmental-monitoring/application/services/environmental-monitoring.service.ts`
+- `src/app/bounded-contexts/environmental-monitoring/application/services/zone.mapper.ts`
+- `src/app/bounded-contexts/environmental-monitoring/domain/models/monitoring.models.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/api/monitoring-api.client.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/repositories/api-monitoring.repository.ts`
+- `src/app/core/config/api.config.ts`
+- `src/app/core/interceptors/api-context.interceptor.spec.ts`
+- `src/app/core/interceptors/api-context.interceptor.ts`
+- `src/app/dashboard/services/dashboard.facade.ts`
+
+### Creados
+
+- `proxy.conf.json`
+- `src/app/bounded-contexts/environmental-monitoring/application/models/monitoring-load-state.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/api/monitoring-zone.dto.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/api/monitoring-zone.fixture.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/mappers/monitoring-zone.mapper.spec.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/mappers/monitoring-zone.mapper.ts`
+- `src/app/bounded-contexts/environmental-monitoring/infrastructure/repositories/api-monitoring.repository.spec.ts`
+- `src/app/bounded-contexts/iam/application/ports/access-token.provider.ts`
+- `src/app/bounded-contexts/iam/infrastructure/auth/configured-access-token.provider.ts`
+- `src/app/bounded-contexts/iam/infrastructure/auth/development-token.store.spec.ts`
+- `src/app/bounded-contexts/iam/infrastructure/auth/development-token.store.ts`
+- `src/environments/environment.mock.ts`
+- `src/environments/environment.production.ts`
+- `src/environments/environment.ts`
 
 ## Design system aplicado
 
@@ -107,10 +185,10 @@ Referencia visual: mockup Environmental Dashboard y láminas del design system a
 
 Tokens en `src/styles.scss`; colores de estado en `_status.scss`; barras de lecturas en `_trend.scss`. Espaciado principal en múltiplos de 8 px, cards de 12 px, botones pill, sombras suaves y foco visible. Los colores de warning/offline siempre se acompañan de texto e iconos. Las fuentes Inter y JetBrains Mono son locales en `public/fonts`, con licencias OFL, sin solicitudes externas en runtime.
 
-Las barras representan las últimas seis mediciones de temperatura, ordenadas por fecha, con alturas relativas al safe range y colores derivados de thresholds. El sistema calcula 7 de 8 nodos activos. El contador Updated refleja la antigüedad real de la última lectura mock y avanza con un timer de presentación; no simula nuevas mediciones ni realiza polling HTTP.
+Las barras representan las últimas seis mediciones de temperatura, ordenadas por fecha, con alturas relativas al safe range y colores derivados de thresholds. El sistema calcula 7 de 8 nodos activos. El contador Updated refleja la antigüedad real de la última lectura y avanza con un timer de presentación; no simula nuevas mediciones ni realiza polling HTTP.
 
-IAM ahora posee el contexto de autenticación en `bounded-contexts/iam`; `core/auth` conserva exports compatibles para los consumidores existentes. No se conectó autenticación real. Las alertas reconocidas conservan la desviación y el evento Normal se muestra como recuperación. Los detalles offline exponen la última conexión.
-## Inventario de archivos
+IAM ahora posee el contexto de autenticación en `bounded-contexts/iam`; `core/auth` conserva exports compatibles para los consumidores existentes. El interceptor usa tokens reales proporcionados externamente; el login frontend sigue pendiente. Las alertas reconocidas conservan la desviación y el evento Normal se muestra como recuperación. Los detalles offline exponen la última conexión.
+## Inventario de la implementación visual original
 
 ### Modificados
 

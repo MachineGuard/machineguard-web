@@ -5,6 +5,9 @@ export interface MonitoringZone {
   name: string;
   description: string;
   deviationStartedAt?: string;
+  reportedStatus?: ZoneStatus;
+  lastUpdatedAt?: string;
+  sensorCounts?: { online: number; offline: number };
 }
 export interface MonitoringPoint {
   id: string;
@@ -14,8 +17,8 @@ export interface MonitoringPoint {
 export interface SensorNode {
   id: string;
   monitoringPointId: string;
-  status: 'ONLINE' | 'OFFLINE';
-  lastSeenAt: string;
+  status: 'ONLINE' | 'OFFLINE' | 'INACTIVE';
+  lastSeenAt?: string;
 }
 export interface Measurement {
   id: string;

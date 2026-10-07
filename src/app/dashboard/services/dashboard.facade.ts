@@ -1,6 +1,6 @@
 import { MonitoringZoneViewModel } from '../../bounded-contexts/environmental-monitoring/application/models/monitoring-zone.view-model';
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, map, shareReplay, timer } from 'rxjs';
+import { combineLatest, filter, map, shareReplay, timer } from 'rxjs';
 import { EnvironmentalMonitoringService } from '../../bounded-contexts/environmental-monitoring/application/services/environmental-monitoring.service';
 import { AlertService } from '../../bounded-contexts/alert-incident-management/application/services/alert.service';
 import {
@@ -13,7 +13,13 @@ export class DashboardFacade {
   private readonly monitoring = inject(EnvironmentalMonitoringService);
   private readonly alerts = inject(AlertService);
   readonly viewModel$ = combineLatest([
-    this.monitoring.zones$,
+    this.monitoring.state$.pipe(
+      filter(state => state.status !== 'loading'),
+      map(state => {
+        if (state.status === 'error') throw state.error;
+        return state.zones;
+      }),
+    ),
     this.alerts.latestAlerts$,
     timer(0, 1000),
   ]).pipe(
@@ -28,7 +34,7 @@ export class DashboardFacade {
               ['PENDING', 'ESCALATED'].includes(alert.status),
           )?.id,
         })),
-        alerts,
+        alerts: alerts.filter(alert => zones.some(zone => zone.id === alert.monitoringZoneId)),
         updatedSeconds: elapsedSeconds(zones),
         summary: ZONE_STATUSES.map((status) => ({
           status,

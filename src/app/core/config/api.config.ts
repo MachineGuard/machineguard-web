@@ -1,11 +1,14 @@
 import { InjectionToken } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 export interface ApiConfig {
   baseUrl: string;
-  /** Set only after validating the Core API contract. */
-  monitoringSnapshotPath?: string;
+  developmentTokenEnabled?: boolean;
 }
 export const API_CONFIG = new InjectionToken<ApiConfig>('API_CONFIG', {
   providedIn: 'root',
-  factory: () => ({ baseUrl: 'http://localhost:8080/api/v1' }),
+  factory: () => ({
+    baseUrl: environment.apiBaseUrl,
+    developmentTokenEnabled: environment.developmentTokenEnabled,
+  }),
 });
