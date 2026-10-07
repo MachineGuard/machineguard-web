@@ -1,22 +1,22 @@
 <article
   [class]="'zone-card ' + statusMeta.className"
-  [attr.aria-label]="zone.name + ': ' + statusMeta.label"
+  [attr.aria-label]="zone.name + ': ' + (statusMeta.label | t)"
 >
   <h3>{{ zone.name }}</h3>
   <p class="description">{{ zone.description }}</p>
   <app-status-badge
-    [label]="statusMeta.label"
+    [label]="statusMeta.label | t"
     [tone]="statusMeta.className"
     [monospace]="true"
     [solid]="zone.status === 'OUT_OF_RANGE'"
   />
   <div class="measurements">
-    <span class="sr-only">Temperature</span>
+    <span class="sr-only">{{ "variable.TEMPERATURE" | t }}</span>
     <p class="temperature mono">
       {{ zone.temperature === null ? "—" : (zone.temperature | number: "1.1-1")
       }}<span>&deg;C</span>
     </p>
-    <span class="sr-only">Relative humidity</span>
+    <span class="sr-only">{{ "variable.HUMIDITY" | t }}</span>
     <p class="humidity mono">
       {{ zone.humidity === null ? "—" : (zone.humidity | number: "1.0-0")
       }}<span>% RH</span>
@@ -26,7 +26,7 @@
     <div
       class="trend"
       role="img"
-      [attr.aria-label]="'Recent temperature readings in ' + zone.name"
+      [attr.aria-label]="'card.trend' | t: { zone: zone.name }"
     >
       @for (bar of zone.temperatureTrend; track $index) {
         <span [class]="'trend-bar level-' + bar.level + ' ' + bar.tone"></span>
@@ -37,28 +37,25 @@
   }
   <div class="zone-information">
     @if (zone.status === "OFFLINE") {
-      <p>Gateway offline for {{ zone.offlineMinutes }} min</p>
+      <p>{{ "card.offlineFor" | t: { n: zone.offlineMinutes ?? 0 } }}</p>
     } @else if (zone.status === "OUT_OF_RANGE") {
       <p class="condition-note">
-        {{ zone.deviationNote }}
+        {{ deviationText }}
         @if (zone.excursionMinutes !== undefined) {
-          &middot; Excursion duration {{ zone.excursionMinutes }} min
+          &middot; {{ "card.excursion" | t: { n: zone.excursionMinutes } }}
         }
       </p>
     } @else if (zone.status === "NEAR_LIMIT") {
       <p class="condition-note">
-        Approaching {{ zone.maxTemperature | number: "1.1-1" }}&deg;C max limit
+        {{ "card.approaching" | t: { max: zone.maxTemperature ?? "—" } }}
       </p>
     } @else {
       <p>
-        Limit {{ zone.minTemperature }}&ndash;{{ zone.maxTemperature }}&deg;C
-        &middot; All parameters stable
+        {{ "card.stable" | t: { min: zone.minTemperature ?? "—", max: zone.maxTemperature ?? "—" } }}
       </p>
     }
     <p class="node-status">
-      {{ zone.onlineNodes || zone.offlineNodes }}
-      {{ zone.onlineNodes || zone.offlineNodes | i18nPlural: nodePlural }}
-      {{ zone.onlineNodes ? "online" : "offline" }} &middot;
+      {{ nodesText }} &middot;
       {{ zone.pointNames.join(", ") }}
     </p>
   </div>
@@ -69,28 +66,28 @@
         [disabled]="busy"
         (click)="acknowledge.emit(zone.id)"
       >
-        <app-icon name="check-circle" />Acknowledge
+        <app-icon name="check-circle" />{{ "card.acknowledge" | t }}
       </button>
     } @else if (zone.status === "NEAR_LIMIT") {
       <button
         class="text-action details-button"
         (click)="viewDetails.emit(zone.id)"
       >
-        <app-icon name="error" /><span>Operating near upper boundary</span>
+        <app-icon name="error" /><span>{{ "card.nearBoundary" | t }}</span>
       </button>
     } @else if (zone.status === "OFFLINE") {
       <button
         class="text-action details-button"
         (click)="viewDetails.emit(zone.id)"
       >
-        <app-icon name="offline" /><span>Connection pending</span>
+        <app-icon name="offline" /><span>{{ "card.pending" | t }}</span>
       </button>
     } @else {
       <button
         class="button secondary details-button"
         (click)="viewDetails.emit(zone.id)"
       >
-        <app-icon name="eye" />View details
+        <app-icon name="eye" />{{ "card.details" | t }}
       </button>
     }
   </div>

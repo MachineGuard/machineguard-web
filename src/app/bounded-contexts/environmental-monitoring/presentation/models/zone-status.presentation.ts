@@ -1,12 +1,13 @@
 import { ZoneStatus } from '../../domain/models/monitoring.models';
 import { StatusTone } from '../../../../shared/components/status-badge/status-badge.component';
 
+/** `label` is a translation key. */
 export const STATUS_META: Record<
   ZoneStatus,
   { label: string; className: StatusTone }
 > = {
-  NORMAL: { label: 'Normal', className: 'normal' },
-  NEAR_LIMIT: { label: 'Near limit', className: 'near-limit' },
-  OUT_OF_RANGE: { label: 'Out of range', className: 'out-of-range' },
-  OFFLINE: { label: 'Offline', className: 'offline' },
+  NORMAL: { label: 'status.NORMAL', className: 'normal' },
+  NEAR_LIMIT: { label: 'status.NEAR_LIMIT', className: 'near-limit' },
+  OUT_OF_RANGE: { label: 'status.OUT_OF_RANGE', className: 'out-of-range' },
+  OFFLINE: { label: 'status.OFFLINE', className: 'offline' },
 };

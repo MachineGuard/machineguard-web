@@ -1,22 +1,22 @@
 <div class="page">
-  <a class="back-link" routerLink="/zones">← Zonas</a>
+  <a class="back-link" routerLink="/zones">{{ "zone.back" | t }}</a>
 
   @switch (state().status) {
     @case ("loading") {
       <div class="panel skeleton" aria-busy="true">
         <span></span><span></span><span></span><span></span>
-        <p class="sr-only">Cargando zona…</p>
+        <p class="sr-only">{{ "zone.loading" | t }}</p>
       </div>
     }
     @case ("error") {
       <div class="panel state" role="alert">
-        <h2>No se pudo cargar la zona</h2>
+        <h2>{{ "zone.error.title" | t }}</h2>
         <p>
-          Puede que ya no exista o que el servicio no haya respondido. Vuelve a
-          intentarlo o regresa a la lista.
+          {{ "zone.error.text" | t }}
         </p>
         <button class="button primary compact" type="button" (click)="load()">
-          Reintentar
+          {{ "common.retry" | t }}
+
         </button>
       </div>
     }
@@ -26,31 +26,31 @@
           <div class="title-row">
             <h1>{{ current.name }}</h1>
             <app-status-badge
-              [label]="current.status === 'ACTIVE' ? 'Activa' : 'Inactiva'"
+              [label]="(current.status === 'ACTIVE' ? 'zone.active' : 'zone.inactive') | t"
               [tone]="current.status === 'ACTIVE' ? 'normal' : 'offline'"
             />
           </div>
-          <p class="lead">{{ current.description || "Sin descripción" }}</p>
+          <p class="lead">{{ current.description || ("common.noDescription" | t) }}</p>
         </div>
 
         @if (saved(); as message) {
           <p class="callout" role="status">
-            <app-icon name="check-circle" /><span class="grow">{{ message }}</span>
+            <app-icon name="check-circle" /><span class="grow">{{ message | t }}</span>
           </p>
         }
         @if (!canEdit()) {
           <p class="callout">
             <app-icon name="eye" /><span class="grow"
-              >Tu rol es Lector: puedes consultar la zona, no modificarla.</span
+              >{{ "zone.readonly" | t }}</span
             >
           </p>
         }
 
         <section class="section">
           <div>
-            <h2>Rangos seguros</h2>
+            <h2>{{ "zone.ranges.title" | t }}</h2>
             <p class="lead">
-              Una medición fuera del rango abre una excursión en Reportes.
+              {{ "zone.ranges.lead" | t }}
             </p>
           </div>
           <div class="range-grid">
@@ -59,7 +59,7 @@
                 <header>
                   <strong>{{ item.label }}</strong>
                   <app-status-badge
-                    [label]="item.range ? 'Configurado' : 'Sin configurar'"
+                    [label]="(item.range ? 'zone.configured' : 'zone.notConfigured') | t"
                     [tone]="item.range ? 'normal' : 'near-limit'"
                   />
                 </header>
@@ -69,13 +69,12 @@
                 <footer>
                   @if (item.range) {
                     <span class="muted"
-                      >Última lectura
+                      >{{ "zone.lastReading" | t }}
                       <span class="mono">{{ item.latest ?? "—" }}</span></span
                     >
                   } @else {
                     <span
-                      >Las mediciones de esta variable se rechazan hasta definir
-                      el rango.</span
+                      >{{ "zone.rejected" | t }}</span
                     >
                   }
                   @if (canEdit()) {
@@ -85,7 +84,7 @@
                       type="button"
                       (click)="open({ kind: 'threshold', variable: item.variable })"
                     >
-                      {{ item.range ? "Editar rango" : "Definir rango" }}
+                      {{ (item.range ? "zone.editRange" : "zone.defineRange") | t }}
                     </button>
                   }
                 </footer>
@@ -97,8 +96,8 @@
         <section class="section">
           <div class="page-head">
             <div>
-              <h2>Puntos de monitoreo</h2>
-              <p class="lead">Cada punto puede tener un sensor asociado.</p>
+              <h2>{{ "zone.points.title" | t }}</h2>
+              <p class="lead">{{ "zone.points.lead" | t }}</p>
             </div>
             @if (canEdit()) {
               <button
@@ -106,16 +105,15 @@
                 type="button"
                 (click)="open({ kind: 'point' })"
               >
-                <app-icon name="plus" />Agregar punto
+                <app-icon name="plus" />{{ "zone.addPoint" | t }}
               </button>
             }
           </div>
           @if (points().length === 0) {
             <div class="panel state">
-              <h2>Esta zona aún no tiene puntos</h2>
+              <h2>{{ "zone.points.empty.title" | t }}</h2>
               <p>
-                Agrega al menos un punto de monitoreo para poder registrar
-                mediciones.
+                {{ "zone.points.empty.text" | t }}
               </p>
             </div>
           } @else {
@@ -123,11 +121,11 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th scope="col">Punto</th>
-                    <th scope="col">Sensor</th>
-                    <th scope="col">Intervalo</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Última medición</th>
+                    <th scope="col">{{ "zone.col.point" | t }}</th>
+                    <th scope="col">{{ "zone.col.sensor" | t }}</th>
+                    <th scope="col">{{ "zone.col.interval" | t }}</th>
+                    <th scope="col">{{ "zone.col.status" | t }}</th>
+                    <th scope="col">{{ "zone.col.last" | t }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,7 +133,7 @@
                     <tr>
                       <td>
                         <strong>{{ row.point.name }}</strong>
-                        <small>{{ row.point.location || "Sin ubicación" }}</small>
+                        <small>{{ row.point.location || ("zone.noLocation" | t) }}</small>
                       </td>
                       @if (row.sensor; as sensor) {
                         <td class="mono">{{ sensor.deviceCode }}</td>
@@ -148,7 +146,7 @@
                         </td>
                         <td class="muted">{{ row.lastSeen }}</td>
                       } @else {
-                        <td colspan="3" class="muted">Sin sensor registrado</td>
+                        <td colspan="3" class="muted">{{ "zone.noSensor" | t }}</td>
                         <td class="align-end">
                           @if (canEdit()) {
                             <button
@@ -162,7 +160,7 @@
                                 })
                               "
                             >
-                              Registrar sensor
+                              {{ "zone.registerSensor" | t }}
                             </button>
                           }
                         </td>
@@ -183,7 +181,7 @@
   @switch (active.kind) {
     @case ("threshold") {
       <app-modal
-        [heading]="'Rango seguro · ' + variableLabel(active.variable)"
+        [heading]="'zone.range.heading' | t: { variable: variableLabel(active.variable) }"
         (closed)="dialog.set(null)"
       >
         <form
@@ -194,12 +192,12 @@
         >
           @if (formError(); as message) {
             <p class="callout error" role="alert">
-              <app-icon name="error" /><span class="grow">{{ message }}</span>
+              <app-icon name="error" /><span class="grow">{{ message | t }}</span>
             </p>
           }
           <div class="field-row">
             <div class="field">
-              <label for="range-min">Mínimo</label>
+              <label for="range-min">{{ "zone.range.min" | t }}</label>
               <input
                 id="range-min"
                 class="mono"
@@ -214,7 +212,7 @@
               />
             </div>
             <div class="field">
-              <label for="range-max">Máximo</label>
+              <label for="range-max">{{ "zone.range.max" | t }}</label>
               <input
                 id="range-max"
                 class="mono"
@@ -231,64 +229,65 @@
           </div>
           @if (submitted() && thresholdForm.invalid) {
             <p class="field-error" role="alert">
-              Ingresa ambos valores como números con hasta dos decimales.
+              {{ "zone.range.invalid" | t }}
             </p>
           } @else if (submitted() && rangeInverted()) {
             <p class="field-error" role="alert">
-              El mínimo debe ser menor que el máximo.
+              {{ "zone.range.inverted" | t }}
             </p>
           }
           <p class="muted" id="range-help">
-            Hasta dos decimales. Los valores límite cuentan como dentro del
-            rango.
+            {{ "zone.range.help" | t }}
           </p>
           <div class="form-actions">
             <button class="button" type="button" (click)="dialog.set(null)">
-              Cancelar
+              {{ "common.cancel" | t }}
+
             </button>
             <button class="button primary" type="submit" [disabled]="saving()">
-              {{ saving() ? "Guardando…" : "Guardar rango" }}
+              {{ (saving() ? "common.saving" : "zone.range.save") | t }}
             </button>
           </div>
         </form>
       </app-modal>
     }
     @case ("point") {
-      <app-modal heading="Agregar punto" (closed)="dialog.set(null)">
+      <app-modal [heading]="'zone.point.heading' | t" (closed)="dialog.set(null)">
         <form class="form" [formGroup]="pointForm" (ngSubmit)="savePoint()" novalidate>
           @if (formError(); as message) {
             <p class="callout error" role="alert">
-              <app-icon name="error" /><span class="grow">{{ message }}</span>
+              <app-icon name="error" /><span class="grow">{{ message | t }}</span>
             </p>
           }
           <div class="field">
-            <label for="point-name">Nombre</label>
+            <label for="point-name">{{ "zone.point.name" | t }}</label>
             <input
               id="point-name"
               formControlName="name"
-              placeholder="Punto 1"
+              [placeholder]="'zone.point.namePlaceholder' | t"
               autocomplete="off"
               [attr.aria-invalid]="submitted() && pointForm.controls.name.invalid"
             />
             @if (submitted() && pointForm.controls.name.invalid) {
-              <p class="field-error" role="alert">Ingresa un nombre para el punto.</p>
+              <p class="field-error" role="alert">{{ "zone.point.nameError" | t }}</p>
             }
           </div>
           <div class="field">
-            <label for="point-location">Ubicación <em>(opcional)</em></label>
+            <label for="point-location">{{ "zone.point.location" | t }} <em>{{ "common.optional" | t }}</em></label>
             <input
               id="point-location"
               formControlName="location"
-              placeholder="Estante B"
+              [placeholder]="'zone.point.locationPlaceholder' | t"
               autocomplete="off"
             />
           </div>
           <div class="form-actions">
             <button class="button" type="button" (click)="dialog.set(null)">
-              Cancelar
+              {{ "common.cancel" | t }}
+
             </button>
             <button class="button primary" type="submit" [disabled]="saving()">
-              {{ saving() ? "Guardando…" : "Agregar punto" }}
+              {{ (saving() ? "common.saving" : "zone.addPoint") | t }}
             </button>
           </div>
         </form>
@@ -296,7 +295,7 @@
     }
     @case ("sensor") {
       <app-modal
-        [heading]="'Registrar sensor · ' + active.pointName"
+        [heading]="'zone.sensor.heading' | t: { point: active.pointName }"
         (closed)="dialog.set(null)"
       >
         <form
@@ -307,11 +306,11 @@
         >
           @if (formError(); as message) {
             <p class="callout error" role="alert">
-              <app-icon name="error" /><span class="grow">{{ message }}</span>
+              <app-icon name="error" /><span class="grow">{{ message | t }}</span>
             </p>
           }
           <div class="field">
-            <label for="sensor-code">Código del dispositivo</label>
+            <label for="sensor-code">{{ "zone.sensor.code" | t }}</label>
             <input
               id="sensor-code"
               class="mono"
@@ -322,12 +321,12 @@
             />
             @if (submitted() && sensorForm.controls.deviceCode.invalid) {
               <p class="field-error" role="alert">
-                Ingresa el código impreso en el nodo.
+                {{ "zone.sensor.codeError" | t }}
               </p>
             }
           </div>
           <div class="field">
-            <label for="sensor-interval">Intervalo de muestreo (segundos)</label>
+            <label for="sensor-interval">{{ "zone.sensor.interval" | t }}</label>
             <input
               id="sensor-interval"
               class="mono"
@@ -338,16 +337,17 @@
             />
             @if (submitted() && sensorForm.controls.interval.invalid) {
               <p class="field-error" role="alert">
-                Ingresa un número entero mayor que cero.
+                {{ "zone.sensor.intervalError" | t }}
               </p>
             }
           </div>
           <div class="form-actions">
             <button class="button" type="button" (click)="dialog.set(null)">
-              Cancelar
+              {{ "common.cancel" | t }}
+
             </button>
             <button class="button primary" type="submit" [disabled]="saving()">
-              {{ saving() ? "Guardando…" : "Registrar" }}
+              {{ (saving() ? "common.saving" : "zone.sensor.save") | t }}
             </button>
           </div>
         </form>

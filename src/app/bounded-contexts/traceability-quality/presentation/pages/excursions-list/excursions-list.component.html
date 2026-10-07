@@ -1,21 +1,21 @@
 <div class="page">
   <div>
-    <h1>Reportes</h1>
+    <h1>{{ "reports.title" | t }}</h1>
     <p class="lead">
-      Excursiones ambientales y evidencia de trazabilidad para auditoría.
+      {{ "reports.lead" | t }}
     </p>
   </div>
 
   <div class="filters">
     <div>
-      <label for="filter-zone">Zona</label>
+      <label for="filter-zone">{{ "reports.filter.zone" | t }}</label>
       <select
         id="filter-zone"
         #zone
         [value]="zoneFilter()"
         (change)="filterByZone(zone.value)"
       >
-        <option value="">Todas las zonas</option>
+        <option value="">{{ "header.allZones" | t }}</option>
         @for (item of zones(); track item.id) {
           <option [value]="item.id" [selected]="item.id === zoneFilter()">
             {{ item.name }}
@@ -24,16 +24,16 @@
       </select>
     </div>
     <div>
-      <label for="filter-status">Estado</label>
+      <label for="filter-status">{{ "reports.filter.status" | t }}</label>
       <select
         id="filter-status"
         #status
         [value]="statusFilter()"
         (change)="filterByStatus(status.value)"
       >
-        <option value="">Todos</option>
-        <option value="ONGOING">En curso</option>
-        <option value="CLOSED">Cerradas</option>
+        <option value="">{{ "reports.filter.all" | t }}</option>
+        <option value="ONGOING">{{ "reports.filter.ongoing" | t }}</option>
+        <option value="CLOSED">{{ "reports.filter.closed" | t }}</option>
       </select>
     </div>
   </div>
@@ -42,18 +42,18 @@
     @case ("loading") {
       <div class="panel skeleton" aria-busy="true">
         <span></span><span></span><span></span><span></span>
-        <p class="sr-only">Cargando excursiones…</p>
+        <p class="sr-only">{{ "reports.loading" | t }}</p>
       </div>
     }
     @case ("error") {
       <div class="panel state" role="alert">
-        <h2>No se pudieron cargar las excursiones</h2>
+        <h2>{{ "reports.error.title" | t }}</h2>
         <p>
-          El servicio no respondió. Tus datos no se perdieron; vuelve a
-          intentarlo en unos segundos.
+          {{ "common.serviceDown" | t }}
         </p>
         <button class="button primary compact" type="button" (click)="load()">
-          Reintentar
+          {{ "common.retry" | t }}
+
         </button>
       </div>
     }
@@ -62,13 +62,13 @@
         <div class="callout error" role="status">
           <app-icon name="error" />
           <span class="grow"
-            ><strong>Excursión en curso · {{ row.zone }}</strong
+            ><strong>{{ "reports.ongoing" | t: { zone: row.zone } }}</strong
             ><br />{{ row.variable }}
             <span class="mono">{{ row.peak }}</span
-            >, límite <span class="mono">{{ row.limit }}</span></span
+            >, {{ "reports.limit" | t }} <span class="mono">{{ row.limit }}</span></span
           >
           <a class="button compact" [routerLink]="['/reports/excursions', row.id]"
-            >Ver excursión</a
+            >{{ "reports.view" | t }}</a
           >
         </div>
       }
@@ -76,16 +76,15 @@
         <div class="panel state">
           <app-icon name="check-circle" />
           @if (filtered()) {
-            <h2>Ninguna excursión coincide con los filtros</h2>
-            <p>Prueba con otra zona o estado.</p>
+            <h2>{{ "reports.empty.filtered.title" | t }}</h2>
+            <p>{{ "reports.empty.filtered.text" | t }}</p>
             <button class="button compact" type="button" (click)="clearFilters()">
-              Quitar filtros
+              {{ "reports.clear" | t }}
             </button>
           } @else {
-            <h2>No se han registrado excursiones</h2>
+            <h2>{{ "reports.empty.title" | t }}</h2>
             <p>
-              Todas las mediciones han estado dentro de su rango seguro. Cuando
-              una lo supere, la excursión aparecerá aquí.
+              {{ "reports.empty.text" | t }}
             </p>
           }
         </div>
@@ -94,13 +93,13 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th scope="col">Zona</th>
-                <th scope="col">Variable</th>
-                <th scope="col">Inicio</th>
-                <th scope="col">Duración</th>
-                <th scope="col">Pico / Límite</th>
-                <th scope="col">Severidad</th>
-                <th scope="col">Estado</th>
+                <th scope="col">{{ "reports.filter.zone" | t }}</th>
+                <th scope="col">{{ "reports.col.variable" | t }}</th>
+                <th scope="col">{{ "reports.col.start" | t }}</th>
+                <th scope="col">{{ "reports.col.duration" | t }}</th>
+                <th scope="col">{{ "reports.col.peak" | t }}</th>
+                <th scope="col">{{ "reports.col.severity" | t }}</th>
+                <th scope="col">{{ "reports.filter.status" | t }}</th>
               </tr>
             </thead>
             <tbody>

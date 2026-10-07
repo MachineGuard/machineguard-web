@@ -2,24 +2,23 @@
   <div class="page-heading">
     <div>
       <p class="eyebrow mono">
-        WAREHOUSE MONITORING <span>/</span> <strong>Zones</strong>
+        {{ "dashboard.eyebrow" | t }} <span>/</span> <strong>{{ "nav.zones" | t }}</strong>
       </p>
       <div class="title-line">
-        <h1>Environmental Dashboard</h1>
+        <h1>{{ "dashboard.title" | t }}</h1>
         @if (vm.updatedSeconds !== null) {
-          <span class="updated">Updated {{ vm.updatedSeconds }}s ago</span>
+          <span class="updated">{{ "dashboard.updated" | t: { n: vm.updatedSeconds } }}</span>
         }
       </div>
     </div>
     <a
       class="button primary"
       routerLink="/zones"
-      [queryParams]="{ action: 'add-point' }"
-      ><app-icon name="plus" />Add Monitored Point</a
+      ><app-icon name="plus" />{{ "dashboard.configure" | t }}</a
     >
   </div>
   <app-status-summary [items]="vm.summary" />
-  <section class="zones-grid" aria-label="Monitored zones">
+  <section class="zones-grid" [attr.aria-label]="'dashboard.zonesLabel' | t">
     @for (zone of vm.zones; track zone.id) {
       <app-zone-card
         [zone]="zone"
@@ -29,7 +28,7 @@
         (viewDetails)="showDetails($event, vm)"
       />
     } @empty {
-      <p>No monitoring zones available.</p>
+      <p>{{ "dashboard.empty" | t }}</p>
     }
   </section>
   <app-latest-alerts
@@ -41,16 +40,16 @@
 } @else {
   @if (loadError()) {
     <p class="error-state" role="alert">
-      Unable to load monitoring data. Please reload to try again.
+      {{ "dashboard.error" | t }}
     </p>
   } @else {
-    <p role="status">Loading environmental conditions&#8230;</p>
+    <p role="status">{{ "dashboard.loading" | t }}</p>
   }
 }
 @if (feedback()) {
   <div class="feedback" role="status">
-    <app-icon name="check-circle" /><span>{{ feedback() }}</span
-    ><button aria-label="Dismiss notification" (click)="feedback.set('')">
+    <app-icon name="check-circle" /><span>{{ feedback() | t }}</span
+    ><button [attr.aria-label]="'dashboard.dismiss' | t" (click)="feedback.set('')">
       &times;
     </button>
   </div>
@@ -61,7 +60,7 @@
       <h2 id="details-title">{{ zone.name }}</h2>
       <button
         class="icon-button"
-        aria-label="Close zone details"
+        [attr.aria-label]="'dashboard.details.close' | t"
         (click)="closeDetails()"
       >
         ×
@@ -69,32 +68,30 @@
     </div>
     <p>{{ zone.description }}</p>
     <app-status-badge
-      [label]="statusMeta[zone.status].label"
+      [label]="statusMeta[zone.status].label | t"
       [tone]="statusMeta[zone.status].className"
     />
     <dl>
-      <dt>Temperature</dt>
+      <dt>{{ "variable.TEMPERATURE" | t }}</dt>
       <dd>{{ zone.temperature ?? "—" }} °C</dd>
-      <dt>Relative humidity</dt>
+      <dt>{{ "variable.HUMIDITY" | t }}</dt>
       <dd>{{ zone.humidity ?? "—" }} %</dd>
-      <dt>Safe temperature range</dt>
+      <dt>{{ "dashboard.details.range" | t }}</dt>
       <dd>
         {{ zone.minTemperature ?? "—" }}–{{ zone.maxTemperature ?? "—" }}
         °C
       </dd>
-      <dt>Sensor nodes</dt>
-      <dd>{{ zone.onlineNodes }} online / {{ zone.offlineNodes }} offline</dd>
-      <dt>Last seen</dt>
-      <dd>{{ zone.lastSeenAt | date: "medium" }}</dd>
-      <dt>Last measurement</dt>
+      <dt>{{ "dashboard.details.nodes" | t }}</dt>
+      <dd>{{ "dashboard.details.nodesValue" | t: { on: zone.onlineNodes, off: zone.offlineNodes } }}</dd>
+      <dt>{{ "dashboard.details.lastSeen" | t }}</dt>
+      <dd>{{ zone.lastSeenAt ? i18n.dateTime(zone.lastSeenAt) : "—" }}</dd>
+      <dt>{{ "dashboard.details.lastMeasurement" | t }}</dt>
       <dd>
         {{
-          zone.lastUpdated
-            ? (zone.lastUpdated | date: "medium")
-            : "No current measurement"
+          zone.lastUpdated ? i18n.dateTime(zone.lastUpdated) : ("dashboard.details.noMeasurement" | t)
         }}
       </dd>
     </dl>
-    <button class="button" (click)="closeDetails()">Close</button>
+    <button class="button" (click)="closeDetails()">{{ "common.close" | t }}</button>
   }
 </dialog>

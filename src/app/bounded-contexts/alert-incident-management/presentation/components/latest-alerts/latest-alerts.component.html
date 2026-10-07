@@ -2,15 +2,15 @@
   <div class="panel-heading">
     <div class="title">
       <app-icon name="alerts" />
-      <h2 id="latest-alerts-title">Latest Alerts</h2>
+      <h2 id="latest-alerts-title">{{ "alerts.title" | t }}</h2>
       @if (requiredCount) {
         <span class="required-count mono"
-          >{{ requiredCount }} Action Required</span
+          >{{ "alerts.required" | t: { n: requiredCount } }}</span
         >
       }
     </div>
     <a routerLink="/incidents"
-      >View All Incident Logs <app-icon name="arrow"
+      >{{ "alerts.viewAll" | t }} <app-icon name="arrow"
     /></a>
   </div>
   <ul class="alert-list">
@@ -24,10 +24,10 @@
           </p>
           <div class="event-meta">
             <time class="mono" [attr.datetime]="alert.raisedAt"
-              >{{ alert.raisedAt | date: "MMM d, HH:mm" : "UTC" }} UTC</time
+              >{{ i18n.dateTime(alert.raisedAt) }}</time
             ><span aria-hidden="true">&middot;</span
             ><span class="event-status">{{
-              statuses[alert.severity].label
+              statuses[alert.severity].label | t
             }}</span>
             @if (alert.contextNote) {
               <span aria-hidden="true">&middot;</span
@@ -38,7 +38,7 @@
         <div class="event-action">
           @if (alert.status === "ACKNOWLEDGED") {
             <span class="acknowledged"
-              ><app-icon name="check-circle" />Acknowledged</span
+              ><app-icon name="check-circle" />{{ "alerts.acknowledged" | t }}</span
             >
           } @else if (
             alert.status === "PENDING" || alert.status === "ESCALATED"
@@ -55,17 +55,17 @@
                   : inspect.emit(alert.monitoringZoneId)
               "
             >
-              {{ alert.severity === "CRITICAL" ? "Acknowledge" : "Inspect" }}
+              {{ (alert.severity === "CRITICAL" ? "card.acknowledge" : "alerts.inspect") | t }}
             </button>
           } @else {
-            <span class="resolved" aria-label="Normal recovery event"
+            <span class="resolved" [attr.aria-label]="'alerts.recovery' | t"
               ><app-icon name="check-circle"
             /></span>
           }
         </div>
       </li>
     } @empty {
-      <li class="empty">No recent alerts.</li>
+      <li class="empty">{{ "alerts.empty" | t }}</li>
     }
   </ul>
 </section>

@@ -65,6 +65,7 @@ export function toMonitoringZoneViewModel(
     (t) => t.environmentalVariable === deviation?.environmentalVariable,
   );
   let deviationNote: string | undefined;
+  let deviationDetail: MonitoringZoneViewModel['deviation'];
   if (deviation && deviationThreshold) {
     const { min, max } = deviationThreshold.safeRange;
     const label =
@@ -76,6 +77,12 @@ export function toMonitoringZoneViewModel(
       deviation.measuredValue > max
         ? `${label} exceeds ${max}${unit} limit`
         : `${label} below ${min}${unit} limit`;
+    const above = deviation.measuredValue > max;
+    deviationDetail = {
+      variable: deviation.environmentalVariable === 'TEMPERATURE' ? 'TEMPERATURE' : 'HUMIDITY',
+      direction: above ? 'above' : 'below',
+      limit: above ? max : min,
+    };
   }
   const statuses = [temperature, humidity]
     .filter((m): m is Measurement => !!m)
@@ -112,6 +119,7 @@ export function toMonitoringZoneViewModel(
       nodes.filter(node => node.status === 'OFFLINE').length,
     lastUpdated: zone.lastUpdatedAt ?? measurements[0]?.recordedAt,
     deviationNote,
+    deviation: deviationDetail,
     pointNames: snapshot.points
       .filter((p) => pointIds.has(p.id))
       .map((p) => p.name),

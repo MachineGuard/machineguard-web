@@ -2,29 +2,28 @@
   <a class="brand" routerLink="/dashboard" (click)="navigated.emit()"
     ><span class="brand-mark"><app-icon name="shield" /></span>MachineGuard</a
   >
-  <nav aria-label="Main navigation">
+  <nav [attr.aria-label]="'nav.main' | t">
     @for (link of links; track link.path) {
       <a
         [routerLink]="link.path"
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
         (click)="navigated.emit()"
-        ><app-icon [name]="link.icon" />{{ link.label }}</a
+        ><app-icon [name]="link.icon" />{{ link.label | t }}</a
       >
     }
   </nav>
   @if (systemStatus$ | async; as status) {
-    <section class="system-status" aria-label="System status">
+    <section class="system-status" [attr.aria-label]="'system.label' | t">
       <div class="system-heading">
-        <span>SYSTEM STATUS</span
+        <span>{{ "system.title" | t }}</span
         ><span
           [class]="'system-dot ' + (status.offline ? 'has-offline' : '')"
         ></span>
       </div>
-      <strong>{{ status.online }} of {{ status.total }} nodes active</strong>
+      <strong>{{ "system.active" | t: { online: status.online, total: status.total } }}</strong>
       <p>
-        {{ status.offline }}
-        {{ status.offline === 1 ? "node" : "nodes" }} offline
+        {{ (status.offline === 1 ? "system.offline.one" : "system.offline.other") | t: { n: status.offline } }}
       </p>
     </section>
   }
