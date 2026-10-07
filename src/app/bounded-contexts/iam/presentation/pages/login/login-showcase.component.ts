@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
-/** Decorative brand panel of the sign-in page; the reading shown is illustrative, not live data. */
+/** Decorative brand panel of the sign-in page. */
 @Component({
   selector: 'app-login-showcase',
   standalone: true,

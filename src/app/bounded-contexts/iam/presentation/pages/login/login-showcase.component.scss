@@ -39,9 +39,13 @@
 .rings .dotted {
   stroke-dasharray: 2 6;
 }
-.brand,
 .pitch {
   position: relative;
+}
+:host > .brand {
+  position: absolute;
+  top: 64px;
+  left: 64px;
 }
 .pitch {
   margin: auto 0;
@@ -55,47 +59,8 @@ h2 {
   letter-spacing: -0.02em;
 }
 .pitch p {
-  margin: 0 0 48px;
+  margin: 0;
   font-size: 16px;
   line-height: 1.5;
   color: #cfe3e8;
-}
-.sample {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 320px;
-  padding: 16px;
-  border: 1px solid rgb(255 255 255 / 14%);
-  border-radius: var(--radius);
-  background: rgb(255 255 255 / 8%);
-}
-.sample-icon {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 12%);
-  color: #5fd4c4;
-}
-.sample-zone {
-  display: block;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: #cfe3e8;
-}
-.sample-reading {
-  display: block;
-  margin-top: 4px;
-  font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: 500;
-}
-.sample-reading em {
-  margin-left: 8px;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-style: normal;
-  color: #5fd4c4;
 }
