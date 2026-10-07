@@ -1,0 +1,212 @@
+<div class="page">
+  <a class="back-link" routerLink="/reports">← Excursiones</a>
+
+  @switch (state().status) {
+    @case ("loading") {
+      <div class="panel skeleton" aria-busy="true">
+        <span></span><span></span><span></span><span></span>
+        <p class="sr-only">Cargando excursión…</p>
+      </div>
+    }
+    @case ("error") {
+      <div class="panel state" role="alert">
+        <h2>No se pudo cargar la excursión</h2>
+        <p>
+          Puede que ya no exista o que el servicio no haya respondido. Vuelve a
+          intentarlo o regresa a la lista.
+        </p>
+        <button class="button primary compact" type="button" (click)="load()">
+          Reintentar
+        </button>
+      </div>
+    }
+    @case ("ready") {
+      @if (view(); as excursion) {
+        <div>
+          <div class="title-row">
+            <h1>{{ excursion.title }}</h1>
+            <app-status-badge
+              [label]="excursion.status.label"
+              [tone]="excursion.status.tone"
+            />
+          </div>
+          <p class="lead">{{ excursion.context }}</p>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat">
+            <strong>{{ excursion.peak }}</strong><span>Valor pico</span>
+          </div>
+          <div class="stat">
+            <strong>{{ excursion.limit }}</strong
+            ><span>{{ excursion.limitLabel }}</span>
+          </div>
+          <div class="stat">
+            <strong>{{ excursion.duration }}</strong
+            ><span>{{ excursion.ongoing ? "Duración hasta ahora" : "Duración" }}</span>
+          </div>
+          <div class="stat">
+            <strong>{{ excursion.severity }}</strong><span>Severidad</span>
+          </div>
+        </div>
+
+        <section class="section">
+          <div>
+            <h2>Historial de mediciones</h2>
+            @if (excursion.range) {
+              <p class="lead">
+                Rango seguro actual de la zona:
+                <span class="mono">{{ excursion.range }}</span>
+              </p>
+            }
+          </div>
+          @if (excursion.historyUnavailable) {
+            <div class="callout error" role="alert">
+              <app-icon name="error" />
+              <span class="grow"
+                >No se pudo leer el historial de mediciones. El resto de la
+                excursión sí está disponible.</span
+              >
+              <button class="button compact" type="button" (click)="load()">
+                Reintentar
+              </button>
+            </div>
+          } @else if (excursion.measurements.length === 0) {
+            <div class="panel state">
+              <p>No hay mediciones registradas en el período de la excursión.</p>
+            </div>
+          } @else {
+            <div class="panel table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Hora</th>
+                    <th scope="col">Punto</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col"><span class="sr-only">Magnitud</span></th>
+                    <th scope="col">Condición</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of excursion.measurements; track $index) {
+                    <tr>
+                      <td class="mono">{{ row.time }}</td>
+                      <td>{{ row.point }}</td>
+                      <td class="mono">{{ row.value }}</td>
+                      <td>
+                        <div class="meter" [class.out]="row.out" aria-hidden="true">
+                          <span [style.width.%]="row.width"></span>
+                        </div>
+                      </td>
+                      <td>
+                        <app-status-badge
+                          [label]="row.out ? 'Fuera de rango' : 'Normal'"
+                          [tone]="row.out ? 'out-of-range' : 'normal'"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+
+        <div class="range-grid">
+          <section class="panel range-card">
+            <h2>No conformidades</h2>
+            @if (excursion.nonConformities.length === 0) {
+              <p class="muted">
+                Ningún lote registrado como afectado por esta excursión.
+              </p>
+            } @else {
+              @for (item of excursion.nonConformities; track item.id) {
+                <div>
+                  <strong class="mono">{{ item.batchCode }}</strong>
+                  {{ item.productName ? "· " + item.productName : "" }}
+                  <div class="muted">
+                    {{ item.classification }} · {{ item.registeredAt }}
+                  </div>
+                </div>
+              }
+            }
+            @if (canEdit()) {
+              <div>
+                <button class="button compact" type="button" (click)="openForm()">
+                  Registrar no conformidad
+                </button>
+              </div>
+            }
+          </section>
+          <section class="panel range-card">
+            <h2>Incidente y acción correctiva</h2>
+            @if (excursion.hasIncident) {
+              <p>{{ excursion.correctiveAction || "Sin acción correctiva registrada." }}</p>
+            } @else if (excursion.ongoing) {
+              <p class="muted">
+                Sin incidente vinculado. La excursión sigue abierta hasta que las
+                mediciones vuelvan al rango seguro.
+              </p>
+            } @else {
+              <p class="muted">
+                Sin incidente vinculado. La excursión se cerró cuando las
+                mediciones volvieron al rango seguro.
+              </p>
+            }
+          </section>
+        </div>
+      }
+    }
+  }
+</div>
+
+@if (registering()) {
+  <app-modal heading="Registrar no conformidad" (closed)="registering.set(false)">
+    <form class="form" [formGroup]="form" (ngSubmit)="register()" novalidate>
+      @if (formError(); as message) {
+        <p class="callout error" role="alert">
+          <app-icon name="error" /><span class="grow">{{ message }}</span>
+        </p>
+      }
+      <div class="field">
+        <label for="nc-batch">Código de lote</label>
+        <input
+          id="nc-batch"
+          class="mono"
+          formControlName="batchCode"
+          placeholder="LOTE-2026-041"
+          autocomplete="off"
+          [attr.aria-invalid]="submitted() && form.controls.batchCode.invalid"
+        />
+        @if (submitted() && form.controls.batchCode.invalid) {
+          <p class="field-error" role="alert">Ingresa el código del lote afectado.</p>
+        }
+      </div>
+      <div class="field">
+        <label for="nc-product">Producto <em>(opcional)</em></label>
+        <input id="nc-product" formControlName="productName" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="nc-class">Clasificación</label>
+        <input
+          id="nc-class"
+          formControlName="classification"
+          placeholder="Ruptura de cadena de frío"
+          autocomplete="off"
+          [attr.aria-invalid]="submitted() && form.controls.classification.invalid"
+        />
+        @if (submitted() && form.controls.classification.invalid) {
+          <p class="field-error" role="alert">Indica el tipo de no conformidad.</p>
+        }
+      </div>
+      <div class="form-actions">
+        <button class="button" type="button" (click)="registering.set(false)">
+          Cancelar
+        </button>
+        <button class="button primary" type="submit" [disabled]="saving()">
+          {{ saving() ? "Guardando…" : "Registrar" }}
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}

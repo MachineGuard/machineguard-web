@@ -1,0 +1,134 @@
+<div class="page">
+  <div>
+    <h1>Reportes</h1>
+    <p class="lead">
+      Excursiones ambientales y evidencia de trazabilidad para auditoría.
+    </p>
+  </div>
+
+  <div class="filters">
+    <div>
+      <label for="filter-zone">Zona</label>
+      <select
+        id="filter-zone"
+        #zone
+        [value]="zoneFilter()"
+        (change)="filterByZone(zone.value)"
+      >
+        <option value="">Todas las zonas</option>
+        @for (item of zones(); track item.id) {
+          <option [value]="item.id" [selected]="item.id === zoneFilter()">
+            {{ item.name }}
+          </option>
+        }
+      </select>
+    </div>
+    <div>
+      <label for="filter-status">Estado</label>
+      <select
+        id="filter-status"
+        #status
+        [value]="statusFilter()"
+        (change)="filterByStatus(status.value)"
+      >
+        <option value="">Todos</option>
+        <option value="ONGOING">En curso</option>
+        <option value="CLOSED">Cerradas</option>
+      </select>
+    </div>
+  </div>
+
+  @switch (state().status) {
+    @case ("loading") {
+      <div class="panel skeleton" aria-busy="true">
+        <span></span><span></span><span></span><span></span>
+        <p class="sr-only">Cargando excursiones…</p>
+      </div>
+    }
+    @case ("error") {
+      <div class="panel state" role="alert">
+        <h2>No se pudieron cargar las excursiones</h2>
+        <p>
+          El servicio no respondió. Tus datos no se perdieron; vuelve a
+          intentarlo en unos segundos.
+        </p>
+        <button class="button primary compact" type="button" (click)="load()">
+          Reintentar
+        </button>
+      </div>
+    }
+    @case ("ready") {
+      @for (row of ongoing(); track row.id) {
+        <div class="callout error" role="status">
+          <app-icon name="error" />
+          <span class="grow"
+            ><strong>Excursión en curso · {{ row.zone }}</strong
+            ><br />{{ row.variable }}
+            <span class="mono">{{ row.peak }}</span
+            >, límite <span class="mono">{{ row.limit }}</span></span
+          >
+          <a class="button compact" [routerLink]="['/reports/excursions', row.id]"
+            >Ver excursión</a
+          >
+        </div>
+      }
+      @if (rows().length === 0) {
+        <div class="panel state">
+          <app-icon name="check-circle" />
+          @if (filtered()) {
+            <h2>Ninguna excursión coincide con los filtros</h2>
+            <p>Prueba con otra zona o estado.</p>
+            <button class="button compact" type="button" (click)="clearFilters()">
+              Quitar filtros
+            </button>
+          } @else {
+            <h2>No se han registrado excursiones</h2>
+            <p>
+              Todas las mediciones han estado dentro de su rango seguro. Cuando
+              una lo supere, la excursión aparecerá aquí.
+            </p>
+          }
+        </div>
+      } @else {
+        <div class="panel table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Zona</th>
+                <th scope="col">Variable</th>
+                <th scope="col">Inicio</th>
+                <th scope="col">Duración</th>
+                <th scope="col">Pico / Límite</th>
+                <th scope="col">Severidad</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.id) {
+                <tr>
+                  <td>
+                    <a class="row-link" [routerLink]="['/reports/excursions', row.id]">{{
+                      row.zone
+                    }}</a>
+                    <small>{{ row.point }}</small>
+                  </td>
+                  <td>{{ row.variable }}</td>
+                  <td class="mono">{{ row.startedAt }}</td>
+                  <td class="mono">{{ row.duration }}</td>
+                  <td class="mono">{{ row.peak }} / {{ row.limit }}</td>
+                  <td>{{ row.severity }}</td>
+                  <td>
+                    <app-status-badge
+                      [label]="row.status.label"
+                      [tone]="row.status.tone"
+                    />
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  }
+</div>

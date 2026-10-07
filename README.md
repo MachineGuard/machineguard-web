@@ -119,6 +119,12 @@ La ruta `/login` autentica contra `POST /api/v1/auth/login` del IAM del Core. To
 
 El modo mock (`npm run start:mock`) no usa Core ni sesión: los guards lo dejan pasar y el perfil es el fixture de presentación.
 
+### Zonas y Reportes
+
+- `/zones` lista las Monitoring Zones con el estado de su configuración; `/zones/:zoneId` permite definir el Safe Range por variable, agregar Monitoring Points y registrar Sensor Nodes. Los formularios solo se muestran al rol `ADMIN`; `VIEWER` ve la misma información en modo consulta.
+- `/reports` lista las excursiones (filtros por zona y estado) y `/reports/excursions/:excursionId` muestra el detalle con el Measurement History y las no conformidades.
+- El dashboard y el estado del sistema se actualizan solos cada 15 s. Si una actualización falla se conserva la última lectura; solo la primera carga muestra el estado de error.
+
 ### Modo mock
 
 ```powershell

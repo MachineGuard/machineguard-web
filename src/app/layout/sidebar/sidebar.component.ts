@@ -37,11 +37,11 @@ export class SidebarComponent {
   @Input() open = false;
   @Output() navigated = new EventEmitter<void>();
   readonly links: { label: string; path: string; icon: IconName }[] = [
-    { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
-    { label: 'Zones', path: '/zones', icon: 'zones' },
-    { label: 'Alerts', path: '/alerts', icon: 'alerts' },
-    { label: 'Incidents', path: '/incidents', icon: 'incidents' },
-    { label: 'Reports', path: '/reports', icon: 'reports' },
-    { label: 'Devices', path: '/devices', icon: 'devices' },
+    { label: 'Panel', path: '/dashboard', icon: 'dashboard' },
+    { label: 'Zonas', path: '/zones', icon: 'zones' },
+    { label: 'Alertas', path: '/alerts', icon: 'alerts' },
+    { label: 'Incidentes', path: '/incidents', icon: 'incidents' },
+    { label: 'Reportes', path: '/reports', icon: 'reports' },
+    { label: 'Dispositivos', path: '/devices', icon: 'devices' },
   ];
 }

@@ -31,52 +31,56 @@ export const routes: Routes = [
       },
       {
         path: 'zones',
-        loadComponent: placeholder,
-        data: {
-          title: 'Zones',
-          context: 'Environmental Monitoring',
-          description:
-            'Monitoring zones, monitored points and safe ranges will be managed here.',
-        },
+        title: 'MachineGuard | Zonas',
+        loadComponent: () =>
+          import('./bounded-contexts/environmental-monitoring/presentation/pages/zones-list/zones-list.component').then((m) => m.ZonesListComponent),
+      },
+      {
+        path: 'zones/:zoneId',
+        title: 'MachineGuard | Zona',
+        loadComponent: () =>
+          import('./bounded-contexts/environmental-monitoring/presentation/pages/zone-detail/zone-detail.component').then((m) => m.ZoneDetailComponent),
       },
       {
         path: 'alerts',
         loadComponent: placeholder,
         data: {
-          title: 'Alerts',
+          title: 'Alertas',
           context: 'Alert & Incident Management',
           description:
-            'The complete alert list and acknowledgement history will be available here.',
+            'La lista completa de alertas y su historial de reconocimiento estarán disponibles aquí.',
         },
       },
       {
         path: 'incidents',
         loadComponent: placeholder,
         data: {
-          title: 'Incidents',
+          title: 'Incidentes',
           context: 'Alert & Incident Management',
           description:
-            'Incident tracking and corrective actions will be available here.',
+            'El seguimiento de incidentes y las acciones correctivas estarán disponibles aquí.',
         },
       },
       {
         path: 'reports',
-        loadComponent: placeholder,
-        data: {
-          title: 'Reports',
-          context: 'Traceability & Quality',
-          description:
-            'Excursions, measurement history and traceability reports will be available here.',
-        },
+        title: 'MachineGuard | Reportes',
+        loadComponent: () =>
+          import('./bounded-contexts/traceability-quality/presentation/pages/excursions-list/excursions-list.component').then((m) => m.ExcursionsListComponent),
+      },
+      {
+        path: 'reports/excursions/:excursionId',
+        title: 'MachineGuard | Excursión',
+        loadComponent: () =>
+          import('./bounded-contexts/traceability-quality/presentation/pages/excursion-detail/excursion-detail.component').then((m) => m.ExcursionDetailComponent),
       },
       {
         path: 'devices',
         loadComponent: placeholder,
         data: {
-          title: 'Devices',
+          title: 'Dispositivos',
           context: 'Environmental Monitoring',
           description:
-            'Sensor nodes, gateway connectivity and device status will be managed here.',
+            'Los nodos sensores, la conectividad del gateway y el estado de los dispositivos se gestionarán aquí.',
         },
       },
       { path: '**', redirectTo: 'dashboard' },
