@@ -34,6 +34,7 @@ export class LatestAlertsComponent {
   }
   @Input({ required: true }) alerts!: Alert[];
   @Input() busy = false;
+  @Input() canManage = false;
   @Output() acknowledge = new EventEmitter<string>();
   @Output() inspect = new EventEmitter<string>();
   readonly statuses: Record<

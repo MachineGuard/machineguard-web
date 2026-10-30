@@ -22,7 +22,7 @@
     @for (zone of vm.zones; track zone.id) {
       <app-zone-card
         [zone]="zone"
-        [canAcknowledge]="!!zone.acknowledgementAlertId"
+        [canAcknowledge]="canManage() && !!zone.acknowledgementAlertId"
         [busy]="busy()"
         (acknowledge)="acknowledgeAlert(zone.acknowledgementAlertId)"
         (viewDetails)="showDetails($event, vm)"
@@ -32,6 +32,7 @@
     }
   </section>
   <app-latest-alerts
+    [canManage]="canManage()"
     [alerts]="vm.alerts"
     [busy]="busy()"
     (acknowledge)="acknowledgeAlert($event)"
