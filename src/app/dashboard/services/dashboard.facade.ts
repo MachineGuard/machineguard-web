@@ -34,7 +34,8 @@ export class DashboardFacade {
               ['PENDING', 'ESCALATED'].includes(alert.status),
           )?.id,
         })),
-        alerts: alerts.filter(alert => zones.some(zone => zone.id === alert.monitoringZoneId)),
+        alerts: alerts.filter(alert => zones.some(zone => zone.id === alert.monitoringZoneId))
+          .map(alert => ({ ...alert, zoneName: zones.find(zone => zone.id === alert.monitoringZoneId)?.name ?? alert.zoneName })),
         updatedSeconds: elapsedSeconds(zones),
         summary: ZONE_STATUSES.map((status) => ({
           status,
