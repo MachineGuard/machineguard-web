@@ -9,7 +9,7 @@
         >
       }
     </div>
-    <a routerLink="/incidents"
+    <a routerLink="/alerts"
       >{{ "alerts.viewAll" | t }} <app-icon name="arrow"
     /></a>
   </div>
@@ -27,7 +27,7 @@
               >{{ i18n.dateTime(alert.raisedAt) }}</time
             ><span aria-hidden="true">&middot;</span
             ><span class="event-status">{{
-              statuses[alert.severity].label | t
+              (alert.severityLevel ? 'operations.severity.' + alert.severityLevel : statuses[alert.severity].label) | t
             }}</span>
             @if (alert.contextNote) {
               <span aria-hidden="true">&middot;</span
@@ -36,7 +36,9 @@
           </div>
         </div>
         <div class="event-action">
-          @if (alert.status === "ACKNOWLEDGED") {
+          @if (alert.incidentId) {
+            <a class="button small secondary" [routerLink]="['/incidents', alert.incidentId]">{{ 'operations.detail' | t }}</a>
+          } @else if (alert.status === "ACKNOWLEDGED") {
             <span class="acknowledged"
               ><app-icon name="check-circle" />{{ "alerts.acknowledged" | t }}</span
             >
@@ -48,10 +50,10 @@
                 'button small ' +
                 (alert.severity === 'CRITICAL' ? 'danger' : 'secondary')
               "
-              [disabled]="busy"
+              [disabled]="busy || (alert.severity === 'CRITICAL' && !canManage)"
               (click)="
                 alert.severity === 'CRITICAL'
-                  ? acknowledge.emit(alert.id)
+                  ? (canManage && acknowledge.emit(alert.id))
                   : inspect.emit(alert.monitoringZoneId)
               "
             >

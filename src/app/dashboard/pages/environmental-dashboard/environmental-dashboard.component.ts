@@ -9,6 +9,7 @@ import {
   ViewChild,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -22,6 +23,8 @@ import { StatusSummaryComponent } from '../../components/status-summary/status-s
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { STATUS_META } from '../../../bounded-contexts/environmental-monitoring/presentation/models/zone-status.presentation';
+import { SessionService } from '../../../bounded-contexts/iam/application/services/session.service';
+import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-environmental-dashboard',
   standalone: true,
@@ -41,6 +44,8 @@ import { STATUS_META } from '../../../bounded-contexts/environmental-monitoring/
 })
 export class EnvironmentalDashboardComponent {
   private readonly facade = inject(DashboardFacade);
+  private readonly session = inject(SessionService);
+  readonly canManage = computed(() => environment.monitoringSource === 'mock' || this.session.session()?.user.role === 'ADMIN');
   readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   @ViewChild('detailsDialog')
@@ -58,7 +63,7 @@ export class EnvironmentalDashboardComponent {
     }),
   );
   acknowledgeAlert(alertId: string | undefined): void {
-    if (!alertId || this.busy()) return;
+    if (!alertId || this.busy() || !this.canManage()) return;
     this.busy.set(true);
     this.feedback.set('');
     this.facade

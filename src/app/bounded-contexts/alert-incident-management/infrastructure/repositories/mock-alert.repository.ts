@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, defer, of, throwError } from 'rxjs';
 import { Alert } from '../../domain/models/alert.models';
-import { AlertRepository } from '../../domain/repositories/alert.repository';
+import { AlertFilters, AlertRepository } from '../../domain/repositories/alert.repository';
 
 @Injectable()
 export class MockAlertRepository implements AlertRepository {
@@ -39,6 +39,10 @@ export class MockAlertRepository implements AlertRepository {
   ]);
   watchLatest() {
     return this.alerts.asObservable();
+  }
+  list(filters: AlertFilters) {
+    return of(this.alerts.value.filter(a => (!filters.monitoringZoneId || a.monitoringZoneId === filters.monitoringZoneId)
+      && (!filters.status || a.status === filters.status)));
   }
   acknowledge(alertId: string) {
     return defer(() => {

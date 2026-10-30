@@ -1,0 +1,14 @@
+.page { max-width: 960px; }
+.facts { display: flex; flex-wrap: wrap; gap: 20px 48px; margin: 0; }
+.facts dt { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.facts dd { margin: 0; font-size: 14px; }
+.identifier { overflow-wrap: anywhere; }
+.alert-message, .section > p { margin: 0; line-height: 1.65; }
+.action-history { list-style: none; margin: 0; padding: 0; }
+.action-history li { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.action-history p { margin: 0 0 8px; line-height: 1.6; overflow-wrap: anywhere; }
+.action-notes, .resolution-notes { white-space: pre-wrap; }
+.field textarea { min-height: 80px; resize: vertical; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; line-height: 1.6; box-sizing: border-box; width: 100%; }
+.field textarea:focus-visible { outline-offset: 2px; border-color: var(--primary); }
+.field textarea:disabled { opacity: .65; }
+@media (max-width: 600px) { .panel.padded { padding: 20px; } .form-actions .button { width: 100%; } }

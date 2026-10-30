@@ -1,0 +1,44 @@
+<div class="page">
+  <header class="page-head"><div><a class="back-link" routerLink="/incidents">{{ 'incident.back' | t }}</a><h1>{{ 'incident.title' | t }}</h1><p class="lead">{{ zoneName() }}</p></div><button class="button secondary compact" (click)="refresh()" [disabled]="busy()">{{ 'operations.refresh' | t }}</button></header>
+  @if (mock) { <p class="callout" role="status">{{ 'operations.mock' | t }}</p> }
+  @if (loadError()) { <p class="callout error" role="alert">{{ loadError() | t }}</p> }
+  @if (loading()) { <p class="state" role="status">{{ 'operations.loading' | t }}</p> }
+  @if (feedback()) { <p class="callout" role="status">{{ feedback() | t }}</p> }
+  @if (actionError()) { <p class="callout error" role="alert">{{ actionError() | t }}</p> }
+  @if (detail(); as d) {
+    <section class="panel padded section" aria-labelledby="incident-summary">
+      <div class="title-row"><h2 id="incident-summary">{{ ('variable.' + (d.incident.environmentalVariable ?? 'UNKNOWN')) | t }}</h2><app-status-badge [label]="('operations.status.' + d.incident.status) | t" [tone]="tone(d.incident.status)" /></div>
+      @if (d.alert) { <p class="alert-message">{{ d.alert.message }}</p> }
+      <dl class="facts"><div><dt>{{ 'operations.opened' | t }}</dt><dd><time [attr.datetime]="d.incident.openedAt">{{ i18n.dateTime(d.incident.openedAt) }}</time></dd></div><div><dt>{{ 'incident.identifier' | t }}</dt><dd class="identifier">{{ d.incident.id }}</dd></div></dl>
+      @if (active()) { <p class="callout">{{ (d.withinSafeRange ? 'incident.safe' : 'incident.unsafe') | t }}</p> }
+      @if (!canManage()) { <p class="muted">{{ 'incident.viewer' | t }}</p> }
+    </section>
+    <section class="section" aria-labelledby="ack-title">
+      <h2 id="ack-title">{{ 'incident.acknowledgement' | t }}</h2>
+      @if (d.acknowledgement; as ack) { <p>{{ 'incident.ackAt' | t }} <time [attr.datetime]="ack.acknowledgedAt">{{ i18n.dateTime(ack.acknowledgedAt) }}</time><span class="muted identifier"> · {{ ack.userId }}</span></p> }
+      @else { <p class="muted">{{ 'incident.notAcknowledged' | t }}</p> }
+      @if (canAcknowledge()) { <div><button class="button primary compact" [disabled]="busy()" (click)="acknowledge()">{{ 'card.acknowledge' | t }}</button></div> }
+    </section>
+    <section class="section" aria-labelledby="actions-title">
+      <h2 id="actions-title">{{ 'incident.actions' | t }}</h2>
+      @if (d.correctiveActions.length) {
+        <ol class="action-history">@for (action of d.correctiveActions; track action.id) { <li><p>{{ action.description }}</p>@if (action.notes) { <p class="muted action-notes">{{ action.notes }}</p> }<p class="muted"><time [attr.datetime]="action.performedAt">{{ i18n.dateTime(action.performedAt) }}</time><span class="identifier"> · {{ action.performedBy }}</span></p></li> }</ol>
+      } @else { <p class="muted">{{ 'incident.noActions' | t }}</p> }
+      @if (canManage() && active()) {
+        <form class="panel padded form" (ngSubmit)="registerAction()">
+          <div class="field"><label for="action-description">{{ 'incident.description' | t }}</label><textarea id="action-description" name="description" [(ngModel)]="description" rows="3" maxlength="1000" required [disabled]="busy()"></textarea></div>
+          <div class="field"><label for="action-notes">{{ 'incident.notes' | t }} <em>{{ 'incident.optional' | t }}</em></label><textarea id="action-notes" name="actionNotes" [(ngModel)]="actionNotes" rows="2" maxlength="1000" [disabled]="busy()"></textarea></div>
+          <div class="form-actions"><button class="button primary compact" type="submit" [disabled]="busy() || !description.trim()">{{ 'incident.saveAction' | t }}</button></div>
+        </form>
+      }
+    </section>
+    <section class="section" aria-labelledby="resolution-title">
+      <h2 id="resolution-title">{{ 'incident.resolution' | t }}</h2>
+      <p class="callout" id="resolution-hint">{{ resolutionHint() | t }}</p>
+      @if (d.incident.resolvedAt; as resolvedAt) { <p>{{ 'incident.resolvedAt' | t }} <time [attr.datetime]="resolvedAt">{{ i18n.dateTime(resolvedAt) }}</time><span class="muted identifier"> · {{ d.incident.resolvedBy }}</span></p>@if (d.incident.resolutionNotes) { <p class="resolution-notes">{{ d.incident.resolutionNotes }}</p> } }
+      @if (canManage() && active()) {
+        <form class="form" (ngSubmit)="resolve()"><div class="field"><label for="resolution-notes">{{ 'incident.resolutionNotes' | t }} <em>{{ 'incident.optional' | t }}</em></label><textarea id="resolution-notes" name="resolutionNotes" [(ngModel)]="resolutionNotes" rows="2" maxlength="1000" [disabled]="busy()"></textarea></div><div class="form-actions"><button class="button primary compact" type="submit" aria-describedby="resolution-hint" [disabled]="busy() || !d.resolutionAllowed">{{ 'incident.resolve' | t }}</button></div></form>
+      }
+    </section>
+  }
+</div>
