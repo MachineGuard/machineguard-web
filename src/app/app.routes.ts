@@ -54,6 +54,10 @@ export const routes: Routes = [
         data: { kind: 'incidents' },
       },
       {
+        path: 'incidents/:incidentId', title: 'nav.incidents',
+        loadComponent: () => import('./bounded-contexts/alert-incident-management/presentation/pages/incident-detail/incident-detail.component').then(m => m.IncidentDetailComponent),
+      },
+      {
         path: 'reports',
         title: 'title.reports',
         loadComponent: () =>
