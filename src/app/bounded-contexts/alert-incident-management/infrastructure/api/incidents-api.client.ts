@@ -8,9 +8,11 @@ import { IncidentDetailDto } from './alert-incident.dto';
 export class IncidentsApiClient {
   private readonly api = inject(ApiClient);
   list(filters: IncidentFilters) {
-    const params: Record<string, string> = {};
+    const params: Record<string, string> = { limit: '500' };
     if (filters.monitoringZoneId) params['monitoringZoneId'] = filters.monitoringZoneId;
     if (filters.status) params['status'] = filters.status;
+    if (filters.from) params['from'] = filters.from;
+    if (filters.to) params['to'] = filters.to;
     return this.api.get<Incident[]>('incidents', params);
   }
   detail(id: string) { return this.api.get<IncidentDetailDto>(`incidents/${encodeURIComponent(id)}`); }

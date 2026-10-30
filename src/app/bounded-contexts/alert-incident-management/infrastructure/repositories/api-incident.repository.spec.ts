@@ -17,7 +17,7 @@ describe('ApiIncidentRepository', () => {
   it('sends zone and status filters without client-supplied identity', () => {
     repository.list({ monitoringZoneId: 'zone-1', status: 'OPEN' }).subscribe();
     const request = http.expectOne(req => req.url === '/api/v1/incidents');
-    expect(request.request.params.keys().sort()).toEqual(['monitoringZoneId', 'status']);
+    expect(request.request.params.keys().sort()).toEqual(['limit', 'monitoringZoneId', 'status']);
     expect(request.request.params.get('status')).toBe('OPEN'); request.flush([]);
   });
   it('loads the eligibility and corrective evidence in the domain detail', () => {

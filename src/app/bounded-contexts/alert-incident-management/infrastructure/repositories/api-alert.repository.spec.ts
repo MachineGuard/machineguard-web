@@ -15,6 +15,13 @@ describe('ApiAlertRepository', () => {
   });
   afterEach(() => http.verify());
 
+  it('applies server filters with no tenant supplied by the page', () => {
+    repository.list({ monitoringZoneId: 'zone-1', status: 'PENDING' }).subscribe();
+    const request = http.expectOne(req => req.url === '/api/v1/alerts');
+    expect(request.request.params.keys().sort()).toEqual(['monitoringZoneId', 'status']);
+    request.flush([]);
+  });
+
   it('polls real resources and preserves the last snapshot when a background refresh fails', fakeAsync(() => {
     let latest = '';
     const subscription = repository.watchLatest().subscribe(items => latest = items[0]?.status ?? '');

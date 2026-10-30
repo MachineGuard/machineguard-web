@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { AlertRepository } from '../../domain/repositories/alert.repository';
+import { AlertFilters, AlertRepository } from '../../domain/repositories/alert.repository';
 import { AlertsApiClient } from '../api/alerts-api.client';
 import { catchError, defer, EMPTY, map, merge, Subject, switchMap, tap, throwError, timer } from 'rxjs';
 import { acknowledgementFromDto, alertFromDto } from '../mappers/alert-incident.mapper';
@@ -8,6 +8,7 @@ import { acknowledgementFromDto, alertFromDto } from '../mappers/alert-incident.
 export class ApiAlertRepository implements AlertRepository {
   private readonly client = inject(AlertsApiClient);
   private readonly refresh = new Subject<void>();
+  list(filters: AlertFilters) { return this.client.list(filters).pipe(map(items => items.map(alertFromDto))); }
   watchLatest() {
     return defer(() => {
       let loaded = false;

@@ -43,23 +43,15 @@ export const routes: Routes = [
       },
       {
         path: 'alerts',
-        loadComponent: placeholder,
-        data: {
-          title: 'nav.alerts',
-          context: 'placeholder.context.alerts',
-          description:
-            'placeholder.alerts',
-        },
+        title: 'nav.alerts',
+        loadComponent: () => import('./bounded-contexts/alert-incident-management/presentation/pages/operations-list/operations-list.component').then(m => m.OperationsListComponent),
+        data: { kind: 'alerts' },
       },
       {
         path: 'incidents',
-        loadComponent: placeholder,
-        data: {
-          title: 'nav.incidents',
-          context: 'placeholder.context.alerts',
-          description:
-            'placeholder.incidents',
-        },
+        title: 'nav.incidents',
+        loadComponent: () => import('./bounded-contexts/alert-incident-management/presentation/pages/operations-list/operations-list.component').then(m => m.OperationsListComponent),
+        data: { kind: 'incidents' },
       },
       {
         path: 'reports',

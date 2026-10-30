@@ -1,0 +1,38 @@
+<div class="page">
+  <header class="page-head">
+    <div><h1>{{ (isAlerts ? 'nav.alerts' : 'nav.incidents') | t }}</h1><p class="lead">{{ (isAlerts ? 'operations.alertsLead' : 'operations.incidentsLead') | t }}</p></div>
+    <button class="button secondary compact" (click)="apply()" [disabled]="loading()">{{ 'operations.refresh' | t }}</button>
+  </header>
+  @if (mock) { <p class="callout" role="status">{{ 'operations.mock' | t }}</p> }
+  <form class="filters" (submit)="$event.preventDefault(); apply()">
+    <div><label for="zone-filter">{{ 'operations.zone' | t }}</label><select id="zone-filter" [value]="zoneFilter()" (change)="zoneFilter.set($any($event.target).value)"><option value="">{{ 'operations.allZones' | t }}</option>@for (zone of zones(); track zone.id) { <option [value]="zone.id">{{ zone.name }}</option> }</select></div>
+    <div><label for="status-filter">{{ 'operations.status' | t }}</label><select id="status-filter" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">{{ 'operations.allStates' | t }}</option>@for (status of statuses; track status) { <option [value]="status">{{ ('operations.status.' + status) | t }}</option> }</select></div>
+    @if (!isAlerts) {
+      <div class="field"><label for="period-from">{{ 'operations.from' | t }}</label><input id="period-from" type="datetime-local" [value]="from()" (change)="from.set($any($event.target).value)"></div>
+      <div class="field"><label for="period-to">{{ 'operations.to' | t }}</label><input id="period-to" type="datetime-local" [value]="to()" (change)="to.set($any($event.target).value)"></div>
+    }
+    <button class="button primary compact" type="submit" [disabled]="loading()">{{ 'operations.filter' | t }}</button>
+    @if (filtered()) { <button class="button secondary compact" type="button" (click)="clear()">{{ 'operations.clear' | t }}</button> }
+  </form>
+  @if (invalidPeriod()) { <p class="field-error" role="alert">{{ 'operations.invalidPeriod' | t }}</p> }
+  @if (error()) { <div class="callout error" role="alert">{{ 'operations.loadError' | t }} <button class="button secondary compact" (click)="apply()">{{ 'operations.retry' | t }}</button></div> }
+  <section class="panel" [attr.aria-busy]="loading()" [attr.aria-label]="(isAlerts ? 'nav.alerts' : 'nav.incidents') | t">
+    @if (loading()) { <p class="state" role="status">{{ 'operations.loading' | t }}</p> }
+    @else if (rows().length) {
+      <ul class="operations-list">
+        @for (row of rows(); track row.id) {
+          <li>
+            <div class="record-main">
+              @if (row.incidentId) { <a class="row-link" [routerLink]="['/incidents', row.incidentId]">{{ zoneName(row.zoneId) }}</a> } @else { <strong>{{ zoneName(row.zoneId) }}</strong> }
+              <p>{{ isAlerts ? row.description : (('variable.' + row.description) | t) }}</p>
+              <span class="muted">{{ (isAlerts ? 'operations.raised' : 'operations.opened') | t }} <time [attr.datetime]="row.date">{{ i18n.dateTime(row.date) }}</time></span>
+              @if (row.severity) { <span class="muted severity">{{ 'operations.severity' | t }}: {{ ('operations.severity.' + row.severity) | t }}</span> }
+            </div>
+            <div class="record-actions"><app-status-badge [label]="('operations.status.' + row.status) | t" [tone]="tone(row.status)" />@if (row.incidentId) { <a class="button secondary compact" [routerLink]="['/incidents', row.incidentId]">{{ 'operations.detail' | t }}</a> }</div>
+          </li>
+        }
+      </ul>
+    } @else if (!error()) { <div class="state"><h2>{{ 'operations.empty' | t }}</h2><p>{{ (filtered() ? 'operations.emptyFilters' : 'operations.emptyHelp') | t }}</p></div> }
+  </section>
+  <p class="muted">{{ (isAlerts ? 'operations.alertRefresh' : 'operations.limit') | t }}</p>
+</div>

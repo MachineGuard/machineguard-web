@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CorrectiveAction, Incident, IncidentDetail, IncidentStatus } from '../models/alert.models';
 
-export interface IncidentFilters { monitoringZoneId?: string; status?: IncidentStatus; }
+export interface IncidentFilters { monitoringZoneId?: string; status?: IncidentStatus; from?: string; to?: string; }
 export interface IncidentRepository {
   list(filters: IncidentFilters): Observable<Incident[]>;
   detail(id: string): Observable<IncidentDetail>;
