@@ -1,6 +1,8 @@
 # MachineGuard Web
 
-Frontend Core sobre el proyecto existente Angular 18.2, standalone, TypeScript y SCSS. Environmental Dashboard con datos mock, sin SSR ni dependencias nuevas. No requiere Angular Material.
+Frontend Core sobre el proyecto existente Angular 18.2, standalone, TypeScript y SCSS. El modo predeterminado consume IAM, Monitoring, Alert & Incident y Traceability mediante HTTP; los datos de demostración se habilitan con `npm run start:mock`. Sin SSR ni dependencias nuevas.
+
+El [flujo de alertas e incidentes](docs/alert-incident-workflow.md) documenta las consultas, permisos, atención, recuperación y pruebas reales. Las notas de la maqueta inicial que siguen describen únicamente su modo mock; las rutas actuales de zonas, alertas, incidentes y reportes ya tienen implementación.
 
 ## Ejecutar
 
