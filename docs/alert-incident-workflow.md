@@ -5,6 +5,10 @@ Core on port 8080, or pass `--proxy-config <file>` to `npm start --` for a diffe
 local backend. Production uses the same-origin `/api/v1` reverse proxy. GitHub
 Pages alone does not provide Core or a database.
 
+After a 401, session refresh automatically repeats GET/HEAD queries only.
+POST/PUT/PATCH/DELETE commands report the error without being repeated; entered
+form text stays available for review and an explicit retry.
+
 ## Access and pages
 
 - Sign in with an existing IAM account. The Bearer interceptor supplies identity;
