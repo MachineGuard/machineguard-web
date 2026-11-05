@@ -76,8 +76,8 @@
     @if (zone.freshness && zone.freshness !== 'FRESH') { <p role="status">{{ 'monitoring.notCurrent' | t }}</p> }
     <dl>
       <dt>{{ 'monitoring.source' | t }}</dt><dd>{{ ('monitoring.source.' + (zone.temperatureSource ?? 'LEGACY_UNKNOWN')) | t }}</dd>
-      <dt>{{ 'monitoring.captured' | t }}</dt><dd>{{ zone.capturedAt ? i18n.dateTime(zone.capturedAt) : '�' }}</dd>
-      <dt>{{ 'monitoring.received' | t }}</dt><dd>{{ zone.receivedAt ? i18n.dateTime(zone.receivedAt) : '�' }}</dd>
+      <dt>{{ 'monitoring.captured' | t }}</dt><dd>{{ zone.capturedAt ? i18n.dateTime(zone.capturedAt) : '—' }}</dd>
+      <dt>{{ 'monitoring.received' | t }}</dt><dd>{{ zone.receivedAt ? i18n.dateTime(zone.receivedAt) : '—' }}</dd>
       <dt>{{ "variable.TEMPERATURE" | t }}</dt>
       <dd>{{ zone.temperature ?? "—" }} °C</dd>
       <dt>{{ "variable.HUMIDITY" | t }}</dt>
