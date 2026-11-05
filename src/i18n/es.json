@@ -377,5 +377,8 @@
   "resolution.INCIDENT_RESOLVED": "El incidente ya está resuelto.",
   "resolution.CORRECTIVE_ACTION_REQUIRED": "Falta registrar una acción correctiva.",
   "resolution.UNKNOWN": "No se pudo confirmar el permiso de resolución.",
-  "status.UNAVAILABLE": "Sin datos vigentes"
+  "status.UNAVAILABLE": "Sin datos vigentes",
+  "system.lastKnown": "Último estado conocido: {online} de {total} nodos en línea",
+  "system.unconfirmed": "Conexión sin confirmar.",
+  "monitoring.lastKnown": "Último estado conocido:"
 }

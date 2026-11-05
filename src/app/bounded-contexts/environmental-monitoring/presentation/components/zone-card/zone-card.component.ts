@@ -39,7 +39,8 @@ export class ZoneCardComponent {
   }
   get nodesText(): string {
     const online = this.zone.onlineNodes;
-    return this.i18n.plural(online ? 'card.nodes.online' : 'card.nodes.offline', online || this.zone.offlineNodes);
+    const text=this.i18n.plural(online ? 'card.nodes.online' : 'card.nodes.offline',online || this.zone.offlineNodes);
+    return this.zone.status==='STALE' || this.zone.status==='UNKNOWN' ? this.i18n.t('monitoring.lastKnown')+' '+text : text;
   }
   get statusMeta() {
     return STATUS_META[this.zone.status];

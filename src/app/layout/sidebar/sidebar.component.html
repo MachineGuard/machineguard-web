@@ -18,12 +18,12 @@
       <div class="system-heading">
         <span>{{ "system.title" | t }}</span
         ><span
-          [class]="'system-dot ' + (status.offline ? 'has-offline' : '')"
+          [class]="'system-dot ' + (status.offline || status.unconfirmed ? 'has-offline' : '')"
         ></span>
       </div>
-      <strong>{{ "system.active" | t: { online: status.online, total: status.total } }}</strong>
+      <strong>{{ (status.unconfirmed ? "system.lastKnown" : "system.active") | t: { online: status.online, total: status.total } }}</strong>
       <p>
-        {{ (status.offline === 1 ? "system.offline.one" : "system.offline.other") | t: { n: status.offline } }}
+        {{ (status.unconfirmed ? "system.unconfirmed" : status.offline === 1 ? "system.offline.one" : "system.offline.other") | t: { n: status.offline } }}
       </p>
     </section>
   }

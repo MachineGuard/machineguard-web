@@ -377,5 +377,8 @@
   "resolution.INCIDENT_RESOLVED": "The incident is already resolved.",
   "resolution.CORRECTIVE_ACTION_REQUIRED": "A corrective action must be recorded.",
   "resolution.UNKNOWN": "Resolution eligibility could not be confirmed.",
-  "status.UNAVAILABLE": "Unavailable"
+  "status.UNAVAILABLE": "Unavailable",
+  "system.lastKnown": "Last known: {online} of {total} nodes online",
+  "system.unconfirmed": "Connection status unconfirmed.",
+  "monitoring.lastKnown": "Last known:"
 }
