@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, DestroyRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable,timer } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { I18nService } from '../../../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { SessionService } from '../../../../iam/application/services/session.service';
@@ -35,6 +36,8 @@ export class ZoneDetailComponent {
   private readonly forms = inject(FormBuilder).nonNullable;
   private readonly i18n = inject(I18nService);
 
+  private readonly destroyRef=inject(DestroyRef);
+  readonly refreshFailed=signal(false);
   readonly state = signal<LoadState<MonitoringZoneDto>>({ status: 'loading' });
   readonly canEdit = computed(() => this.session()?.user.role === 'ADMIN');
   readonly zone = computed(() => {
@@ -45,13 +48,15 @@ export class ZoneDetailComponent {
     const zone = this.zone();
     return (['TEMPERATURE', 'HUMIDITY'] as const).map((variable) => {
       const threshold = zone?.thresholds.find((t) => t.environmentalVariable === variable);
-      const latest = zone?.latestMeasurements.find((m) => m.environmentalVariable === variable);
+      const physical=(zone?.latestPhysicalMeasurements ?? []).filter(m=>m.environmentalVariable===variable && zone?.sensors.some(n=>n.id===m.sensorNodeId && n.status!=='INACTIVE'));
+      const latest=physical.find(m=>m.freshness==='FRESH') ?? physical[0] ?? zone?.latestMeasurements.find(m=>m.environmentalVariable===variable);
       return {
         variable,
         label: this.i18n.t(`variable.${variable}`),
         unit: UNITS[variable],
         range: threshold ? `${formatValue(threshold.minimumValue)} – ${formatValue(threshold.maximumValue)}` : null,
         threshold,
+        reading:latest,
         latest: latest ? `${formatValue(latest.measuredValue)} ${UNITS[variable]}` : null,
       };
     });
@@ -64,7 +69,7 @@ export class ZoneDetailComponent {
         point,
         sensor,
         status: sensor ? { label: this.i18n.t(`zone.sensor.${sensor.status}`), tone: SENSOR_TONE[sensor.status] } : null,
-        lastSeen: this.i18n.elapsed(sensor?.lastMeasurementAt ?? null),
+        lastSeen: this.i18n.elapsed(sensor?.lastReceivedAt ?? null),
       };
     });
   });
@@ -90,10 +95,14 @@ export class ZoneDetailComponent {
 
   constructor() {
     this.load();
+    timer(15_000,15_000).pipe(takeUntilDestroyed()).subscribe(()=>this.load());
   }
 
   load(): void {
-    loadInto(this.state, this.api.getZone(this.zoneId));
+    this.api.getZone(this.zoneId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next:data=>{this.state.set({status:'ready',data});this.refreshFailed.set(false);},
+      error:()=>{this.refreshFailed.set(true);if(this.state().status!=='ready')this.state.set({status:'error'});},
+    });
   }
 
   open(dialog: Dialog): void {

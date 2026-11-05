@@ -20,7 +20,7 @@
         <div class="event-content">
           <p>
             <strong>{{ alert.zoneName }}</strong
-            ><span class="message"> &middot; {{ alert.message }}</span>
+            ><span class="message"> &middot; {{ 'incident.originMessage' | t }} {{ alert.message }}</span>
           </p>
           <div class="event-meta">
             <time class="mono" [attr.datetime]="alert.raisedAt"

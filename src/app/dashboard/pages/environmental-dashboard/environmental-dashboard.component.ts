@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, of, tap } from 'rxjs';
 import { DashboardFacade } from '../../services/dashboard.facade';
 import { DashboardViewModel } from '../../models/dashboard.view-model';
 import { MonitoringZoneViewModel } from '../../../bounded-contexts/environmental-monitoring/application/models/monitoring-zone.view-model';
@@ -57,6 +57,7 @@ export class EnvironmentalDashboardComponent {
   readonly selectedZone = signal<MonitoringZoneViewModel | null>(null);
   readonly statusMeta = STATUS_META;
   readonly viewModel$ = this.facade.viewModel$.pipe(
+    tap(vm=>{const selected=this.selectedZone();if(selected)this.selectedZone.set(vm.zones.find(z=>z.id===selected.id) ?? {...selected,status:'UNKNOWN',freshness:'STALE'});}),
     catchError(() => {
       this.loadError.set(true);
       return of(null);

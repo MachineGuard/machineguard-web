@@ -32,10 +32,11 @@ describe('ApiAlertRepository', () => {
     expect(latest).toBe('CLOSED'); subscription.unsubscribe();
   }));
   it('surfaces a failed first request instead of substituting mock data', fakeAsync(() => {
-    let failed = false;
-    repository.watchLatest().subscribe({ next: () => fail('Unexpected mock fallback'), error: () => failed = true });
-    tick(0); http.expectOne('/api/v1/alerts').flush({}, { status: 401, statusText: 'Unauthorized' });
+    let failed=false;
+    const subscription=repository.watchLatestState().subscribe(state=>failed=state.refreshFailed);
+    tick(0);http.expectOne('/api/v1/alerts').flush({},{status:401,statusText:'Unauthorized'});
     expect(failed).toBeTrue();
+    tick(15_000);http.expectOne('/api/v1/alerts').flush([ALERT_FIXTURE]);expect(failed).toBeFalse();subscription.unsubscribe();
   }));
   it('maps the acknowledgement and refreshes only after a confirmed command', fakeAsync(() => {
     const subscription = repository.watchLatest().subscribe();

@@ -1,6 +1,7 @@
 <div class="page">
   <a class="back-link" routerLink="/zones">{{ "zone.back" | t }}</a>
 
+  @if (refreshFailed()) { <p class="callout error" role="alert">{{ 'monitoring.refreshFailed' | t }}</p> }
   @switch (state().status) {
     @case ("loading") {
       <div class="panel skeleton" aria-busy="true">
@@ -66,6 +67,12 @@
                 <div class="range-value">
                   {{ item.range ?? "— – —" }}<small>{{ item.unit }}</small>
                 </div>
+                @if (item.reading; as reading) {
+                  <p>{{ ('monitoring.source.' + (reading.source ?? 'LEGACY_UNKNOWN')) | t }}</p>
+                  @if (refreshFailed() || reading.freshness !== 'FRESH') { <p role="status">{{ 'monitoring.notCurrent' | t }}</p> }
+                  <p>{{ 'monitoring.captured' | t }}: {{ reading.recordedAt }}</p>
+                  <p>{{ 'monitoring.received' | t }}: {{ reading.receivedAt }}</p>
+                }
                 <footer>
                   @if (item.range) {
                     <span class="muted"

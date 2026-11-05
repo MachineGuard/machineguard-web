@@ -53,4 +53,27 @@ describe('IncidentDetailComponent', () => {
     response.next({}); response.complete(); tick(0);
     expect(fixture.componentInstance.description).toBe(''); expect(fixture.componentInstance.busy()).toBeFalse(); fixture.destroy();
   }));
+  it('F4 derives the current label from historical without replacing the original message', fakeAsync(() => {
+    const historical={...DETAIL_FIXTURE,incident:{...DETAIL_FIXTURE.incident,historical:true},
+      alert:{...DETAIL_FIXTURE.alert!,message:'Desviacion historica'}};
+    service.detail.and.returnValues(of(incidentDetailFromDto(historical as any)),of(incidentDetailFromDto({
+      ...historical,incident:{...historical.incident,historical:false}} as any)));
+    const fixture=TestBed.createComponent(IncidentDetailComponent);tick(0);fixture.detectChanges();
+    const i18n=fixture.componentInstance.i18n;i18n.use('en');fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Historical incident');
+    tick(15_000);fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Current incident');
+    expect(fixture.nativeElement.textContent).toContain('Desviacion historica');
+    i18n.use('es');fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Incidente actual');fixture.destroy();
+  }));
+  it('F4 retains resolution text when evidence expires after GET', fakeAsync(() => {
+    service.detail.and.returnValue(of({...incidentDetailFromDto(DETAIL_FIXTURE),withinSafeRange:true,resolutionAllowed:true}));
+    service.resolve.and.returnValue(throwError(()=>new HttpErrorResponse({status:409})));
+    const fixture=TestBed.createComponent(IncidentDetailComponent);tick(0);
+    fixture.componentInstance.resolutionNotes='Cooling checked';fixture.componentInstance.resolve();tick(0);
+    expect(fixture.componentInstance.resolutionNotes).toBe('Cooling checked');
+    expect(fixture.componentInstance.actionError()).toBe('incident.conflict');fixture.destroy();
+  }));
+
 });

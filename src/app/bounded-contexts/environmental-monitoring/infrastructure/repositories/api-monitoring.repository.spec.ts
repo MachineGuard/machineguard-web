@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed,fakeAsync,tick,discardPeriodicTasks } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ALERT_REPOSITORY } from '../../../alert-incident-management/domain/repositories/alert.repository';
@@ -44,14 +44,14 @@ describe('HTTP monitoring dashboard composition', () => {
     http.expectOne(url).flush([]);
     expect(states[states.length - 1]).toEqual({ status: 'empty', zones: [] }); subscription.unsubscribe();
   });
-  it('propagates authentication failures to the existing dashboard error state', () => {
+  it('propagates authentication failures to the existing dashboard error state', fakeAsync(() => {
     const states: MonitoringLoadState[] = [];
     const service = TestBed.inject(EnvironmentalMonitoringService);
     const subscription = service.state$.subscribe(state => states.push(state));
     let failed = false;
-    const dashboard = TestBed.inject(DashboardFacade).viewModel$.subscribe({ error: () => failed = true });
+    const dashboard = TestBed.inject(DashboardFacade).viewModel$.subscribe(vm => failed=vm.refreshFailed===true);
     http.expectOne(url).flush({ detail: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
-    expect(states[states.length - 1].status).toBe('error'); expect(failed).toBeTrue();
-    subscription.unsubscribe(); dashboard.unsubscribe();
-  });
+    tick(0);expect(states[states.length - 1].status).toBe('error'); expect(failed).toBeTrue();
+    subscription.unsubscribe(); dashboard.unsubscribe();discardPeriodicTasks();
+  }));
 });

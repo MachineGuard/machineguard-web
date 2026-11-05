@@ -13,6 +13,7 @@ export interface Alert {
   status: AlertStatus;
   raisedAt: string;
   contextNote?: string;
+  historical?: boolean;
 }
 export interface Acknowledgement {
   alertId: string;
@@ -34,6 +35,7 @@ export interface Incident {
   resolvedAt: string | null;
   resolvedBy: string | null;
   resolutionNotes: string | null;
+  historical?: boolean;
 }
 export interface CorrectiveAction {
   id: string;
@@ -50,4 +52,5 @@ export interface IncidentDetail {
   correctiveActions: CorrectiveAction[];
   withinSafeRange: boolean;
   resolutionAllowed: boolean;
+  resolutionBlockReasons?: string[];
 }

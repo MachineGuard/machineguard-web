@@ -3,7 +3,7 @@
     <article [class]="'summary-card ' + meta[item.status].className">
       <span class="summary-dot"></span>
       <div>
-        <strong>{{ item.count }} {{ meta[item.status].label | t }}</strong>
+        <strong>{{ item.count }} {{ (item.status === 'OFFLINE' ? 'status.UNAVAILABLE' : meta[item.status].label) | t }}</strong>
         <p>{{ "summary." + item.status | t }}</p>
       </div>
       <app-icon [name]="icons[item.status]" />

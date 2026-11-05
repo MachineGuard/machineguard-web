@@ -12,7 +12,7 @@ import { IncidentService } from '../../../application/services/incident.service'
 import { AlertStatus, IncidentStatus } from '../../../domain/models/alert.models';
 import { incidentTone } from '../../incident.presentation';
 
-interface OperationRow { id: string; zoneId: string; status: string; date: string; description: string; incidentId?: string; severity?: string; }
+interface OperationRow { id: string; zoneId: string; status: string; date: string; description: string; incidentId?: string; severity?: string; historical?: boolean; }
 
 @Component({
   selector: 'app-operations-list', standalone: true,
@@ -49,11 +49,11 @@ export class OperationsListComponent {
       const request: Observable<OperationRow[]> = this.isAlerts
         ? this.alerts.list({ monitoringZoneId, status: (this.applied.status || undefined) as AlertStatus | undefined }).pipe(
           map(items => items.map(a => ({ id: a.id, zoneId: a.monitoringZoneId, status: a.status, date: a.raisedAt,
-            description: a.message, incidentId: a.incidentId, severity: a.severityLevel ?? a.severity }))))
+            historical:a.historical,description: a.message, incidentId: a.incidentId, severity: a.severityLevel ?? a.severity }))))
         : this.incidents.list({ monitoringZoneId, status: (this.applied.status || undefined) as IncidentStatus | undefined,
           from: this.applied.from || undefined, to: this.applied.to || undefined }).pipe(
           map(items => items.map(i => ({ id: i.id, zoneId: i.monitoringZoneId, status: i.status, date: i.openedAt,
-            description: i.environmentalVariable ?? 'UNKNOWN', incidentId: i.id }))));
+            historical:i.historical,description: i.environmentalVariable ?? 'UNKNOWN', incidentId: i.id }))));
       return request.pipe(map(rows => { this.error.set(false); return rows; }), catchError(() => {
         this.error.set(true); return of(null);
       }));

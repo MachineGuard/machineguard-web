@@ -23,4 +23,10 @@ describe('Alert and incident transport mapping', () => {
     expect(detail.alert).toBeNull(); expect(detail.acknowledgement).toBeNull();
     expect(incidentDetailFromDto({ ...DETAIL_FIXTURE, withinSafeRange: true, resolutionAllowed: true }).resolutionAllowed).toBeTrue();
   });
+  it('F4 denies resolution when server eligibility metadata is absent or has blocking reasons',()=>{
+    const ready={...DETAIL_FIXTURE,withinSafeRange:true,resolutionAllowed:true};
+    expect(incidentDetailFromDto({...ready,resolutionBlockReasons:undefined} as any).resolutionAllowed).toBeFalse();
+    expect(incidentDetailFromDto({...ready,resolutionBlockReasons:['STALE']} as any).resolutionAllowed).toBeFalse();
+  });
+
 });

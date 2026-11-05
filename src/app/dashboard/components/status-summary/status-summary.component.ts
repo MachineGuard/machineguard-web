@@ -22,6 +22,6 @@ export class StatusSummaryComponent {
     NORMAL: 'check-circle',
     NEAR_LIMIT: 'incidents',
     OUT_OF_RANGE: 'temperature',
-    OFFLINE: 'offline',
+    OFFLINE: 'offline', STALE:'offline',NO_DATA:'offline',UNKNOWN:'offline',
   };
 }

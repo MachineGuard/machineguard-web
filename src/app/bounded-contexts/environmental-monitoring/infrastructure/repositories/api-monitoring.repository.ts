@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, concat, EMPTY, map, switchMap, timer } from 'rxjs';
+import { catchError, concat, defer, of, map, switchMap, timer } from 'rxjs';
 import { MonitoringRepository } from '../../domain/repositories/monitoring.repository';
 import { MonitoringApiClient } from '../api/monitoring-api.client';
+import { MonitoringSnapshot } from '../../domain/models/monitoring.models';
 import { zonesToMonitoringSnapshot } from '../mappers/monitoring-zone.mapper';
 
 export const SNAPSHOT_REFRESH_MS = 15_000;
@@ -10,12 +11,14 @@ export const SNAPSHOT_REFRESH_MS = 15_000;
 export class ApiMonitoringRepository implements MonitoringRepository {
   private readonly client = inject(MonitoringApiClient);
 
-  /** Loads once and then polls. A failed refresh keeps the last snapshot; only the first load can fail. */
+  /** Failures are snapshots too: preserve data and keep polling after an initial error. */
   watchSnapshot() {
-    const load = () => this.client.getZones().pipe(map(zonesToMonitoringSnapshot));
-    return concat(
-      load(),
-      timer(SNAPSHOT_REFRESH_MS, SNAPSHOT_REFRESH_MS).pipe(switchMap(() => load().pipe(catchError(() => EMPTY)))),
-    );
+    return defer(() => {
+      let last: MonitoringSnapshot = {zones:[],points:[],nodes:[],measurements:[],thresholds:[]};
+      return concat(of(0),timer(SNAPSHOT_REFRESH_MS,SNAPSHOT_REFRESH_MS)).pipe(switchMap(() =>
+        this.client.getZones().pipe(map(zones => {
+          last={...zonesToMonitoringSnapshot(zones),refreshFailed:false};return last;
+        }),catchError(() => of({...last,refreshFailed:true})))));
+    });
   }
 }

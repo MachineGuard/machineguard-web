@@ -11,6 +11,7 @@ export interface DashboardViewModel {
   alerts: Alert[];
   summary: StatusSummaryItem[];
   updatedSeconds: number | null;
+  refreshFailed?: boolean;
 }
 export interface DashboardZoneViewModel extends MonitoringZoneViewModel {
   acknowledgementAlertId?: string;

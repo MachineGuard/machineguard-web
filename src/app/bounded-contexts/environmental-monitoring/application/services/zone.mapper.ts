@@ -110,6 +110,8 @@ export function toMonitoringZoneViewModel(
   return {
     ...zone,
     temperature: temperature?.measuredValue ?? null,
+    freshness: zone.freshness,temperatureSource:temperature?.source,humiditySource:humidity?.source,
+    capturedAt:temperature?.recordedAt,receivedAt:temperature?.receivedAt,
     humidity: humidity?.measuredValue ?? null,
     status,
     minTemperature: temperatureRange?.min,
