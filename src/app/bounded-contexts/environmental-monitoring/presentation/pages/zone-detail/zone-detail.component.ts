@@ -12,6 +12,7 @@ import { StatusBadgeComponent, StatusTone } from '../../../../../shared/componen
 import { LoadState, loadInto } from '../../../../../shared/format/load-state';
 import { formatValue, saveErrorKey, UNITS } from '../../../../../shared/format/presentation';
 import { MonitoringApiClient } from '../../../infrastructure/api/monitoring-api.client';
+import { newestFirst } from '../../../application/services/zone.mapper';
 import { EnvironmentalVariableDto, MonitoringZoneDto } from '../../../infrastructure/api/monitoring-zone.dto';
 
 type Dialog =
@@ -48,7 +49,8 @@ export class ZoneDetailComponent {
     const zone = this.zone();
     return (['TEMPERATURE', 'HUMIDITY'] as const).map((variable) => {
       const threshold = zone?.thresholds.find((t) => t.environmentalVariable === variable);
-      const physical=(zone?.latestPhysicalMeasurements ?? []).filter(m=>m.environmentalVariable===variable && zone?.sensors.some(n=>n.id===m.sensorNodeId && n.status!=='INACTIVE'));
+      const physical=(zone?.latestPhysicalMeasurements ?? []).filter(m=>m.environmentalVariable===variable && zone?.sensors.some(n=>n.id===m.sensorNodeId && n.status!=='INACTIVE')
+        && zone.points.some(p=>p.id===m.monitoringPointId && p.status==='ACTIVE')).sort(newestFirst);
       const latest=physical.find(m=>m.freshness==='FRESH') ?? physical[0] ?? zone?.latestMeasurements.find(m=>m.environmentalVariable===variable);
       return {
         variable,
