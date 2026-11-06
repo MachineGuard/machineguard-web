@@ -15,6 +15,11 @@ export const apiContextInterceptor: HttpInterceptorFn = (request, next) => {
       !(target.pathname === basePath || target.pathname.startsWith(`${basePath}/`))) {
     return next(request);
   }
+  // Login and refresh authenticate with their body; an expired Bearer would reject renewal.
+  if (request.method === 'POST' &&
+      [ `${basePath}/auth/login`, `${basePath}/auth/refresh` ].includes(target.pathname)) {
+    return next(request.clone({ headers: request.headers.delete('Authorization') }));
+  }
   const token = tokens.getAccessToken();
   return next(token ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : request);
 };

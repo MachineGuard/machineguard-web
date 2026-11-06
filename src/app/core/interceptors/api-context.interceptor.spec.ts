@@ -41,4 +41,25 @@ describe('API JWT interceptor', () => {
       expect(external.request.headers.has('Authorization')).toBeFalse(); external.flush([]);
     }
   });
+
+  it('omits Bearer only for exact body-authenticated POSTs and protects validate/logout', () => {
+    TestBed.inject(AuthContextService).setContext({ accessToken: 'expired-token', organizationId: 'org', userId: 'user' });
+    const base = 'http://localhost:8080/api/v1';
+    for (const path of ['auth/login', 'auth/refresh']) {
+      http.post(`${base}/${path}?source=test`, {}, { headers: { Authorization: 'Bearer expired-token' } }).subscribe();
+      const request = controller.expectOne(`${base}/${path}?source=test`);
+      expect(request.request.headers.has('Authorization')).toBeFalse();
+      request.flush({});
+    }
+    for (const path of ['auth/validate', 'auth/logout', 'auth/refresh-extra', 'auth/refresh/']) {
+      http.post(`${base}/${path}`, {}).subscribe();
+      const request = controller.expectOne(`${base}/${path}`);
+      expect(request.request.headers.get('Authorization')).toBe('Bearer expired-token');
+      request.flush({});
+    }
+    http.get(`${base}/auth/refresh`).subscribe();
+    const get = controller.expectOne(`${base}/auth/refresh`);
+    expect(get.request.headers.get('Authorization')).toBe('Bearer expired-token');
+    get.flush({});
+  });
 });
