@@ -15,10 +15,10 @@ import { IncidentDetail } from '../../../domain/models/alert.models';
 import { incidentTone } from '../../incident.presentation';
 
 @Component({
-  selector: 'app-incident-detail', standalone: true,
-  imports: [RouterLink, FormsModule, TranslatePipe, StatusBadgeComponent],
-  templateUrl: './incident-detail.component.html', styleUrl: './incident-detail.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-incident-detail',
+    imports: [RouterLink, FormsModule, TranslatePipe, StatusBadgeComponent],
+    templateUrl: './incident-detail.component.html', styleUrl: './incident-detail.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IncidentDetailComponent {
   private readonly incidents = inject(IncidentService);

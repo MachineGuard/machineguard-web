@@ -1,5 +1,5 @@
-import { inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, DOCUMENT } from '@angular/core';
+
 import { HttpInterceptorFn } from '@angular/common/http';
 import { API_CONFIG } from '../config/api.config';
 import { ACCESS_TOKEN_PROVIDER } from '../../bounded-contexts/iam/application/ports/access-token.provider';
@@ -14,6 +14,11 @@ export const apiContextInterceptor: HttpInterceptorFn = (request, next) => {
   if (target.origin !== base.origin ||
       !(target.pathname === basePath || target.pathname.startsWith(`${basePath}/`))) {
     return next(request);
+  }
+  // Login and refresh authenticate with their body; an expired Bearer would reject renewal.
+  if (request.method === 'POST' &&
+      [ `${basePath}/auth/login`, `${basePath}/auth/refresh` ].includes(target.pathname)) {
+    return next(request.clone({ headers: request.headers.delete('Authorization') }));
   }
   const token = tokens.getAccessToken();
   return next(token ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : request);

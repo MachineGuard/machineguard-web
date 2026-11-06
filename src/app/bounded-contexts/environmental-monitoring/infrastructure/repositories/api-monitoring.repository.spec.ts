@@ -1,5 +1,5 @@
 import { TestBed,fakeAsync,tick,discardPeriodicTasks } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ALERT_REPOSITORY } from '../../../alert-incident-management/domain/repositories/alert.repository';
 import { MockAlertRepository } from '../../../alert-incident-management/infrastructure/repositories/mock-alert.repository';
@@ -16,7 +16,7 @@ describe('HTTP monitoring dashboard composition', () => {
   let http: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [
-      provideHttpClient(), provideHttpClientTesting(),
+      provideHttpClient(withXhr()), provideHttpClientTesting(),
       { provide: API_CONFIG, useValue: { baseUrl: '/api/v1' } },
       { provide: MONITORING_REPOSITORY, useClass: ApiMonitoringRepository },
       { provide: ALERT_REPOSITORY, useClass: MockAlertRepository },

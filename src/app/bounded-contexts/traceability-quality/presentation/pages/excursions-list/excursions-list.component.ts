@@ -13,11 +13,10 @@ import { ExcursionDto, ExcursionsApiClient, ExcursionStatus } from '../../../inf
 import { EXCURSION_TONE } from '../../excursion.presentation';
 
 @Component({
-  selector: 'app-excursions-list',
-  standalone: true,
-  imports: [RouterLink, IconComponent, StatusBadgeComponent, TranslatePipe],
-  templateUrl: './excursions-list.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-excursions-list',
+    imports: [RouterLink, IconComponent, StatusBadgeComponent, TranslatePipe],
+    templateUrl: './excursions-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExcursionsListComponent {
   private readonly excursions = inject(ExcursionsApiClient);

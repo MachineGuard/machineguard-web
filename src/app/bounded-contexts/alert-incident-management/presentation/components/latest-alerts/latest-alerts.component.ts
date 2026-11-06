@@ -11,17 +11,15 @@ import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { RouterLink } from '@angular/router';
 import { Alert, AlertSeverity } from '../../../domain/models/alert.models';
 import {
-  StatusBadgeComponent,
   StatusTone,
 } from '../../../../../shared/components/status-badge/status-badge.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 @Component({
-  selector: 'app-latest-alerts',
-  standalone: true,
-  imports: [RouterLink, StatusBadgeComponent, IconComponent, TranslatePipe],
-  templateUrl: './latest-alerts.component.html',
-  styleUrl: './latest-alerts.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-latest-alerts',
+    imports: [RouterLink, IconComponent, TranslatePipe],
+    templateUrl: './latest-alerts.component.html',
+    styleUrl: './latest-alerts.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LatestAlertsComponent {
   readonly i18n = inject(I18nService);

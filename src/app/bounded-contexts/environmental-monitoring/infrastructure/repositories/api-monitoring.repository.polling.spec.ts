@@ -1,5 +1,5 @@
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { API_CONFIG } from '../../../../core/config/api.config';
 import { zoneFixture } from '../api/monitoring-zone.fixture';
@@ -12,7 +12,7 @@ describe('Environmental Monitoring HTTP access', () => {
   let http: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [
-      provideHttpClient(), provideHttpClientTesting(), ApiMonitoringRepository,
+      provideHttpClient(withXhr()), provideHttpClientTesting(), ApiMonitoringRepository,
       { provide: API_CONFIG, useValue: { baseUrl: '/api/v1' } },
     ] });
     http = TestBed.inject(HttpTestingController);

@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [develop, main]
   push:
-    branches: [develop]
+    branches: [develop, "feature/**"]
 
 permissions:
   contents: read
@@ -16,8 +16,31 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.22.3
           cache: npm
       - run: npm ci
       - run: npm run build
       - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - name: Capture dependency inventory
+        if: always()
+        run: |
+          mkdir -p reports
+          if [ -d node_modules ]; then
+            npm ls --all --json > reports/npm-dependency-inventory.json
+          else
+            cp package-lock.json reports/npm-dependency-inventory.json
+          fi
+      - name: Audit production dependencies
+        if: always()
+        run: |
+          mkdir -p reports
+          npm audit --omit=dev --audit-level=low --json > reports/npm-audit-production.json
+      - name: Upload production dependency audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-production
+          path: |
+            reports/npm-dependency-inventory.json
+            reports/npm-audit-production.json
+          if-no-files-found: error

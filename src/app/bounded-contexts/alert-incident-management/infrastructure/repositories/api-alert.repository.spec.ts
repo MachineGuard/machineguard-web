@@ -1,5 +1,5 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { API_CONFIG } from '../../../../core/config/api.config';
 import { ApiAlertRepository } from './api-alert.repository';
@@ -9,7 +9,7 @@ describe('ApiAlertRepository', () => {
   let repository: ApiAlertRepository;
   let http: HttpTestingController;
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), ApiAlertRepository,
+    TestBed.configureTestingModule({ providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), ApiAlertRepository,
       { provide: API_CONFIG, useValue: { baseUrl: '/api/v1' } }] });
     repository = TestBed.inject(ApiAlertRepository); http = TestBed.inject(HttpTestingController);
   });

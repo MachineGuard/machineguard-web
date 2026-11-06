@@ -8,12 +8,11 @@ import {
 } from '../../../shared/components/icon/icon.component';
 import { ZoneStatus } from '../../../bounded-contexts/environmental-monitoring/domain/models/monitoring.models';
 @Component({
-  selector: 'app-status-summary',
-  standalone: true,
-  imports: [IconComponent, TranslatePipe],
-  templateUrl: './status-summary.component.html',
-  styleUrl: './status-summary.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-status-summary',
+    imports: [IconComponent, TranslatePipe],
+    templateUrl: './status-summary.component.html',
+    styleUrl: './status-summary.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatusSummaryComponent {
   @Input({ required: true }) items!: StatusSummaryItem[];

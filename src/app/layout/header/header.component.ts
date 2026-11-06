@@ -17,12 +17,11 @@ import {
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [AsyncPipe, IconComponent, RouterLink, TranslatePipe, LanguageSwitchComponent],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-header',
+    imports: [AsyncPipe, IconComponent, RouterLink, TranslatePipe, LanguageSwitchComponent],
+    templateUrl: './header.component.html',
+    styleUrl: './header.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent {
   private readonly sessions = inject(SessionService);

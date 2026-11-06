@@ -1,6 +1,6 @@
 # MachineGuard Web
 
-Frontend Core sobre el proyecto existente Angular 18.2, standalone, TypeScript y SCSS. El modo predeterminado consume IAM, Monitoring, Alert & Incident y Traceability mediante HTTP; los datos de demostración se habilitan con `npm run start:mock`. Sin SSR ni dependencias nuevas.
+Frontend Core de MachineGuard, Angular 22.2, standalone, TypeScript y SCSS. El modo predeterminado consume IAM, Monitoring, Alert & Incident y Traceability mediante HTTP; los datos de demostración se habilitan con `npm run start:mock`. Sin SSR ni dependencias nuevas. Runtime de desarrollo y CI: Node 22.22.3, registrado en .nvmrc.
 
 Las tarjetas y el detalle muestran datos obsoletos y el origen de las lecturas.
 El detalle del incidente explica los bloqueos de resoluci�n y distingue el estado
@@ -21,6 +21,7 @@ Abrir http://localhost:4200/dashboard. `/` redirige a `/dashboard`.
 ```sh
 npm run build
 npm test -- --watch=false --browsers=ChromeHeadless
+npm audit --omit=dev --audit-level=low
 ```
 
 Las pruebas requieren Chrome. Si no se detecta en Windows:

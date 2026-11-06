@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { API_CONFIG } from '../../../../core/config/api.config';
@@ -25,7 +25,7 @@ describe('IAM session', () => {
   const configure = () => {
     router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
     TestBed.configureTestingModule({ providers: [
-      provideHttpClient(withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])), provideHttpClientTesting(),
+      provideHttpClient(withXhr(), withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])), provideHttpClientTesting(),
       { provide: API_CONFIG, useValue: { baseUrl: BASE, developmentTokenEnabled: false } },
       { provide: ACCESS_TOKEN_PROVIDER, useExisting: ConfiguredAccessTokenProvider },
       { provide: Router, useValue: router },
@@ -83,6 +83,7 @@ describe('IAM session', () => {
     controller.match(ZONES).forEach((request) => request.flush(null, { status: 401, statusText: 'Unauthorized' }));
     const refresh = controller.expectOne(`${BASE}/auth/refresh`);
     expect(refresh.request.body).toEqual({ refreshToken: 'refresh-1' });
+    expect(refresh.request.headers.has('Authorization')).toBeFalse();
     refresh.flush(authentication('2'));
     const replayed = controller.match(ZONES);
     expect(replayed.length).toBe(2);
@@ -92,6 +93,7 @@ describe('IAM session', () => {
     });
     expect(results).toEqual([['zone'], ['zone']]);
     expect(session.session()?.refreshToken).toBe('refresh-2');
+    expect(JSON.parse(sessionStorage.getItem(SessionStore.storageKey)!).refreshToken).toBe('refresh-2');
   });
 
   it('ends the session and returns to login when the refresh token is rejected', () => {
@@ -106,6 +108,23 @@ describe('IAM session', () => {
     expect(sessionStorage.getItem(SessionStore.storageKey)).toBeNull();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
   });
+
+  for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+    it(`does not renew or replay a failed ${method} with both interceptors`, () => {
+      const session = configure();
+      signIn(session);
+      let status = 0;
+      http.request(method, `${BASE}/incidents/i/resolve`, { body: { notes: 'Keep pending notes' } })
+        .subscribe({ error: error => status = error.status });
+      const command = controller.expectOne(`${BASE}/incidents/i/resolve`);
+      expect(command.request.headers.get('Authorization')).toBe('Bearer access-1');
+      command.flush(null, { status: 401, statusText: 'Unauthorized' });
+      expect(status).toBe(401);
+      controller.expectNone(`${BASE}/auth/refresh`);
+      controller.expectNone(`${BASE}/incidents/i/resolve`);
+      expect(session.isAuthenticated()).toBeTrue();
+    });
+  }
 
   it('revokes the session on logout and signs out even if the API fails', () => {
     const session = configure();
