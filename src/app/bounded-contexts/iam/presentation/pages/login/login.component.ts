@@ -9,12 +9,11 @@ import { LoginShowcaseComponent } from './login-showcase.component';
 import { SessionService } from '../../../application/services/session.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, LoginShowcaseComponent, TranslatePipe, LanguageSwitchComponent],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-login',
+    imports: [ReactiveFormsModule, IconComponent, LoginShowcaseComponent, TranslatePipe, LanguageSwitchComponent],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
   private readonly session = inject(SessionService);

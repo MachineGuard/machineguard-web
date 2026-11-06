@@ -17,12 +17,11 @@ import {
 } from '../../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [AsyncPipe, RouterLink, RouterLinkActive, IconComponent, TranslatePipe],
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-sidebar',
+    imports: [AsyncPipe, RouterLink, RouterLinkActive, IconComponent, TranslatePipe],
+    templateUrl: './sidebar.component.html',
+    styleUrl: './sidebar.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
   readonly systemStatus$ = inject(EnvironmentalMonitoringService).state$.pipe(

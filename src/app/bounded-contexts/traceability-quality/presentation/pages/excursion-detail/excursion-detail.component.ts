@@ -23,11 +23,10 @@ interface Loaded {
 }
 
 @Component({
-  selector: 'app-excursion-detail',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
-  templateUrl: './excursion-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-excursion-detail',
+    imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
+    templateUrl: './excursion-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExcursionDetailComponent {
   private readonly api = inject(ExcursionsApiClient);

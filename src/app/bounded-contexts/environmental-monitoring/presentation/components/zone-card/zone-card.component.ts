@@ -14,12 +14,11 @@ import { StatusBadgeComponent } from '../../../../../shared/components/status-ba
 import { STATUS_META } from '../../models/zone-status.presentation';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 @Component({
-  selector: 'app-zone-card',
-  standalone: true,
-  imports: [DecimalPipe, StatusBadgeComponent, IconComponent, TranslatePipe],
-  templateUrl: './zone-card.component.html',
-  styleUrl: './zone-card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-zone-card',
+    imports: [DecimalPipe, StatusBadgeComponent, IconComponent, TranslatePipe],
+    templateUrl: './zone-card.component.html',
+    styleUrl: './zone-card.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZoneCardComponent {
   private readonly i18n = inject(I18nService);

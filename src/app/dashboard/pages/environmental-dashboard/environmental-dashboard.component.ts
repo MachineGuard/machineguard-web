@@ -26,21 +26,20 @@ import { STATUS_META } from '../../../bounded-contexts/environmental-monitoring/
 import { SessionService } from '../../../bounded-contexts/iam/application/services/session.service';
 import { environment } from '../../../../environments/environment';
 @Component({
-  selector: 'app-environmental-dashboard',
-  standalone: true,
-  imports: [
-    AsyncPipe,
-    TranslatePipe,
-    RouterLink,
-    ZoneCardComponent,
-    LatestAlertsComponent,
-    StatusSummaryComponent,
-    IconComponent,
-    StatusBadgeComponent,
-  ],
-  templateUrl: './environmental-dashboard.component.html',
-  styleUrl: './environmental-dashboard.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-environmental-dashboard',
+    imports: [
+        AsyncPipe,
+        TranslatePipe,
+        RouterLink,
+        ZoneCardComponent,
+        LatestAlertsComponent,
+        StatusSummaryComponent,
+        IconComponent,
+        StatusBadgeComponent,
+    ],
+    templateUrl: './environmental-dashboard.component.html',
+    styleUrl: './environmental-dashboard.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EnvironmentalDashboardComponent {
   private readonly facade = inject(DashboardFacade);

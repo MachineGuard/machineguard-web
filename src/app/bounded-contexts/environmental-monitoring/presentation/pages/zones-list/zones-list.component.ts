@@ -19,11 +19,10 @@ interface ZoneRow {
 }
 
 @Component({
-  selector: 'app-zones-list',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
-  templateUrl: './zones-list.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-zones-list',
+    imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
+    templateUrl: './zones-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZonesListComponent {
   private readonly api = inject(MonitoringApiClient);

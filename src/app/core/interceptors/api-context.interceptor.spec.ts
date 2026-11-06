@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { apiContextInterceptor } from './api-context.interceptor';
 import { AuthContextService } from '../auth/auth-context.service';
@@ -12,7 +12,7 @@ describe('API JWT interceptor', () => {
   let controller: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [
-      provideHttpClient(withInterceptors([apiContextInterceptor])), provideHttpClientTesting(),
+      provideHttpClient(withXhr(), withInterceptors([apiContextInterceptor])), provideHttpClientTesting(),
       { provide: API_CONFIG, useValue: { baseUrl: 'http://localhost:8080/api/v1', developmentTokenEnabled: false } },
       { provide: ACCESS_TOKEN_PROVIDER, useExisting: ConfiguredAccessTokenProvider },
     ] });

@@ -24,11 +24,10 @@ const DECIMAL = /^-?\d{1,4}([.,]\d{1,2})?$/;
 const SENSOR_TONE: Record<string, StatusTone> = { ONLINE: 'normal', OFFLINE: 'offline', INACTIVE: 'offline' };
 
 @Component({
-  selector: 'app-zone-detail',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
-  templateUrl: './zone-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-zone-detail',
+    imports: [ReactiveFormsModule, RouterLink, IconComponent, ModalComponent, StatusBadgeComponent, TranslatePipe],
+    templateUrl: './zone-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZoneDetailComponent {
   private readonly api = inject(MonitoringApiClient);

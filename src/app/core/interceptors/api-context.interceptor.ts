@@ -1,5 +1,5 @@
-import { inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, DOCUMENT } from '@angular/core';
+
 import { HttpInterceptorFn } from '@angular/common/http';
 import { API_CONFIG } from '../config/api.config';
 import { ACCESS_TOKEN_PROVIDER } from '../../bounded-contexts/iam/application/ports/access-token.provider';

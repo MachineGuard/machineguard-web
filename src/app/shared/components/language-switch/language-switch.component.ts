@@ -4,11 +4,10 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 /** EN | ES selector shared by the header and the sign-in page. */
 @Component({
-  selector: 'app-language-switch',
-  standalone: true,
-  imports: [TranslatePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<div class="language" role="group" [attr.aria-label]="'header.language' | t">
+    selector: 'app-language-switch',
+    imports: [TranslatePipe],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    template: `<div class="language" role="group" [attr.aria-label]="'header.language' | t">
     @for (option of options; track option.code) {
       <button
         type="button"
@@ -21,7 +20,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
       </button>
     }
   </div>`,
-  styles: `
+    styles: `
     .language {
       display: flex;
       border-radius: 999px;
@@ -43,7 +42,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
       font-weight: 600;
       box-shadow: 0 1px 3px #0b1f2a12;
     }
-  `,
+  `
 })
 export class LanguageSwitchComponent {
   readonly i18n = inject(I18nService);

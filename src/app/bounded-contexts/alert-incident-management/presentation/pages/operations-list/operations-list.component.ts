@@ -15,11 +15,11 @@ import { incidentTone } from '../../incident.presentation';
 interface OperationRow { id: string; zoneId: string; status: string; date: string; description: string; incidentId?: string; severity?: string; historical?: boolean; }
 
 @Component({
-  selector: 'app-operations-list', standalone: true,
-  imports: [RouterLink, TranslatePipe, StatusBadgeComponent],
-  templateUrl: './operations-list.component.html',
-  styleUrl: './operations-list.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-operations-list',
+    imports: [RouterLink, TranslatePipe, StatusBadgeComponent],
+    templateUrl: './operations-list.component.html',
+    styleUrl: './operations-list.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OperationsListComponent {
   private readonly alerts = inject(AlertService);

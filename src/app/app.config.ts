@@ -12,7 +12,7 @@ import { I18nTitleStrategy } from './core/i18n/i18n-title.strategy';
 import { ApiAlertRepository } from './bounded-contexts/alert-incident-management/infrastructure/repositories/api-alert.repository';
 import { ApiIncidentRepository } from './bounded-contexts/alert-incident-management/infrastructure/repositories/api-incident.repository';
 import { INCIDENT_REPOSITORY } from './bounded-contexts/alert-incident-management/domain/repositories/incident.repository';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { apiContextInterceptor } from './core/interceptors/api-context.interceptor';
 import { MONITORING_REPOSITORY } from './bounded-contexts/environmental-monitoring/domain/repositories/monitoring.repository';
 import { MockMonitoringRepository } from './bounded-contexts/environmental-monitoring/infrastructure/repositories/mock-monitoring.repository';
@@ -27,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     { provide: TitleStrategy, useClass: I18nTitleStrategy },
-    provideHttpClient(withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])),
     { provide: MONITORING_REPOSITORY, useClass: environment.monitoringSource === 'mock' ? MockMonitoringRepository : ApiMonitoringRepository },
     { provide: ACCESS_TOKEN_PROVIDER, useExisting: ConfiguredAccessTokenProvider },
     { provide: ALERT_REPOSITORY, useClass: environment.monitoringSource === 'mock' ? MockAlertRepository : ApiAlertRepository },

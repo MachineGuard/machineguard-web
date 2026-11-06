@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+
+import { computed, effect, inject, Injectable, signal, DOCUMENT } from '@angular/core';
 import en from '../../../i18n/en.json';
 import es from '../../../i18n/es.json';
 

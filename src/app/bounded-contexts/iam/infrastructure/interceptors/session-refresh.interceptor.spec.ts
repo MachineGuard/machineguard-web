@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient,withInterceptors,HttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, HttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController,provideHttpClientTesting } from '@angular/common/http/testing';
 import { of,Subject } from 'rxjs';
 import { SessionService } from '../../application/services/session.service';
@@ -9,7 +9,7 @@ describe('Session refresh request safety',()=>{
   let http:HttpTestingController;let client:HttpClient;let session:any;
   beforeEach(()=>{
     session={isAuthenticated:()=>true,refresh:jasmine.createSpy().and.returnValue(of({})),end:jasmine.createSpy()};
-    TestBed.configureTestingModule({providers:[provideHttpClient(withInterceptors([sessionRefreshInterceptor])),provideHttpClientTesting(),
+    TestBed.configureTestingModule({providers:[provideHttpClient(withXhr(), withInterceptors([sessionRefreshInterceptor])),provideHttpClientTesting(),
       {provide:SessionService,useValue:session}]});
     http=TestBed.inject(HttpTestingController);client=TestBed.inject(HttpClient);
   });

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { API_CONFIG } from '../../../../core/config/api.config';
@@ -25,7 +25,7 @@ describe('IAM session', () => {
   const configure = () => {
     router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
     TestBed.configureTestingModule({ providers: [
-      provideHttpClient(withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])), provideHttpClientTesting(),
+      provideHttpClient(withXhr(), withInterceptors([sessionRefreshInterceptor, apiContextInterceptor])), provideHttpClientTesting(),
       { provide: API_CONFIG, useValue: { baseUrl: BASE, developmentTokenEnabled: false } },
       { provide: ACCESS_TOKEN_PROVIDER, useExisting: ConfiguredAccessTokenProvider },
       { provide: Router, useValue: router },
