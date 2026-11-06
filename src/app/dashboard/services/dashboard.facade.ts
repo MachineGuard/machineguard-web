@@ -15,16 +15,16 @@ export class DashboardFacade {
   readonly viewModel$ = combineLatest([
     this.monitoring.state$.pipe(
       filter(state => state.status !== 'loading'),
-      map(state => {
-        if (state.status === 'error') throw state.error;
-        return state.zones;
-      }),
+      map(state => state),
     ),
-    this.alerts.latestAlerts$,
+    this.alerts.latestState$,
     timer(0, 1000),
   ]).pipe(
     map(
-      ([zones, alerts]): DashboardViewModel => ({
+      ([state, alertState]): DashboardViewModel => {
+        const zones=state.zones;const alerts=alertState.alerts;
+        return ({
+        refreshFailed: state.status==='error' || alertState.refreshFailed,
         zones: zones.map((zone) => ({
           ...zone,
           acknowledgementAlertId: alerts.find(
@@ -39,9 +39,9 @@ export class DashboardFacade {
         updatedSeconds: elapsedSeconds(zones),
         summary: ZONE_STATUSES.map((status) => ({
           status,
-          count: zones.filter((z) => z.status === status).length,
+          count: zones.filter((z) => z.status === status || status==='OFFLINE' && ['STALE','NO_DATA','UNKNOWN'].includes(z.status)).length,
         })),
-      }),
+      });},
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );

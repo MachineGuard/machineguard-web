@@ -17,6 +17,7 @@
       ><app-icon name="plus" />{{ "dashboard.configure" | t }}</a
     >
   </div>
+  @if (vm.refreshFailed) { <p class="error-state" role="alert">{{ 'monitoring.refreshFailed' | t }}</p> }
   <app-status-summary [items]="vm.summary" />
   <section class="zones-grid" [attr.aria-label]="'dashboard.zonesLabel' | t">
     @for (zone of vm.zones; track zone.id) {
@@ -72,7 +73,11 @@
       [label]="statusMeta[zone.status].label | t"
       [tone]="statusMeta[zone.status].className"
     />
+    @if (zone.freshness && zone.freshness !== 'FRESH') { <p role="status">{{ 'monitoring.notCurrent' | t }}</p> }
     <dl>
+      <dt>{{ 'monitoring.source' | t }}</dt><dd>{{ ('monitoring.source.' + (zone.temperatureSource ?? 'LEGACY_UNKNOWN')) | t }}</dd>
+      <dt>{{ 'monitoring.captured' | t }}</dt><dd>{{ zone.capturedAt ? i18n.dateTime(zone.capturedAt) : '—' }}</dd>
+      <dt>{{ 'monitoring.received' | t }}</dt><dd>{{ zone.receivedAt ? i18n.dateTime(zone.receivedAt) : '—' }}</dd>
       <dt>{{ "variable.TEMPERATURE" | t }}</dt>
       <dd>{{ zone.temperature ?? "—" }} °C</dd>
       <dt>{{ "variable.HUMIDITY" | t }}</dt>

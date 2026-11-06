@@ -12,7 +12,7 @@ export function alertFromDto(dto: AlertDto): Alert {
     id: dto.id, incidentId: dto.incidentId, monitoringZoneId: dto.monitoringZoneId,
     // The composition layer resolves the real zone name; an identifier is an honest interim fallback.
     zoneName: dto.monitoringZoneId, severity: VISUAL_SEVERITY[dto.severity], severityLevel: dto.severity,
-    status: dto.status, message: dto.message, raisedAt: dto.raisedAt,
+    historical:dto.historical,status: dto.status, message: dto.message, raisedAt: dto.raisedAt,
   };
 }
 export function acknowledgementFromDto(dto: AcknowledgementDto): Acknowledgement {
@@ -20,10 +20,12 @@ export function acknowledgementFromDto(dto: AcknowledgementDto): Acknowledgement
 }
 export function incidentDetailFromDto(dto: IncidentDetailDto): IncidentDetail {
   return {
-    incident: dto.incident, alert: dto.alert ? alertFromDto(dto.alert) : null,
+    incident: {...dto.incident,historical:dto.incident.historical}, alert: dto.alert ? alertFromDto(dto.alert) : null,
     acknowledgement: dto.acknowledgement ? { userId: dto.acknowledgement.acknowledgedBy,
       acknowledgedAt: dto.acknowledgement.acknowledgedAt, note: dto.acknowledgement.note } : null,
     correctiveActions: dto.correctiveActions,
-    withinSafeRange: dto.withinSafeRange === true, resolutionAllowed: dto.resolutionAllowed === true,
+    withinSafeRange: dto.withinSafeRange === true, resolutionAllowed: dto.resolutionAllowed === true && dto.withinSafeRange === true
+      && Array.isArray(dto.resolutionBlockReasons) && dto.resolutionBlockReasons.length===0,
+    resolutionBlockReasons: dto.resolutionBlockReasons ?? ['UNKNOWN'],
   };
 }

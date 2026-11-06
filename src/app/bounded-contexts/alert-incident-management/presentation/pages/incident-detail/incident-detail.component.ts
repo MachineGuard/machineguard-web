@@ -40,7 +40,7 @@ export class IncidentDetailComponent {
   readonly zones = toSignal(inject(EnvironmentalMonitoringService).zones$, { initialValue: [] });
   readonly zoneName = computed(() => this.zones().find(z => z.id === this.detail()?.incident.monitoringZoneId)?.name
     ?? this.detail()?.incident.monitoringZoneId ?? '');
-  readonly resolutionHint = computed(() => !this.active() ? 'incident.closedHelp' : !this.canManage() ? 'incident.viewer'
+  readonly resolutionHint = computed(() => this.loadError() ? 'monitoring.refreshFailed' : !this.active() ? 'incident.closedHelp' : !this.canManage() ? 'incident.viewer'
     : !this.detail()?.correctiveActions.length ? 'incident.needsAction'
     : !this.detail()?.withinSafeRange ? 'incident.needsRecovery' : 'incident.ready');
   readonly tone = incidentTone;
@@ -62,6 +62,10 @@ export class IncidentDetailComponent {
       if (detail) { this.detail.set(detail); this.loadError.set(''); }
       this.loading.set(false);
     });
+  }
+  reasonKey(reason:string):string {
+    return ['NO_DATA','STALE','MISSING_POINT','MANUAL_ONLY','OUT_OF_RANGE','LEGACY_UNKNOWN','MISSING_THRESHOLD','NO_REQUIRED_POINTS','ZONE_INACTIVE','READ_ONLY','INCIDENT_RESOLVED','CORRECTIVE_ACTION_REQUIRED'].includes(reason)
+      ? 'resolution.'+reason : 'resolution.UNKNOWN';
   }
   refresh(): void { this.reload.next(); }
   acknowledge(): void {

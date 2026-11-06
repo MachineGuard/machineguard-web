@@ -1,5 +1,5 @@
 export type EnvironmentalVariable = 'TEMPERATURE' | 'RELATIVE_HUMIDITY';
-export type ZoneStatus = 'NORMAL' | 'NEAR_LIMIT' | 'OUT_OF_RANGE' | 'OFFLINE';
+export type ZoneStatus = 'NORMAL' | 'NEAR_LIMIT' | 'OUT_OF_RANGE' | 'OFFLINE' | 'STALE' | 'NO_DATA' | 'UNKNOWN';
 export interface MonitoringZone {
   id: string;
   name: string;
@@ -7,6 +7,7 @@ export interface MonitoringZone {
   deviationStartedAt?: string;
   reportedStatus?: ZoneStatus;
   lastUpdatedAt?: string;
+  freshness?: string;
   sensorCounts?: { online: number; offline: number };
 }
 export interface MonitoringPoint {
@@ -19,6 +20,10 @@ export interface SensorNode {
   monitoringPointId: string;
   status: 'ONLINE' | 'OFFLINE' | 'INACTIVE';
   lastSeenAt?: string;
+  administrativeStatus?: string;
+  availability?: string;
+  receivedAgeSeconds?: number;
+  freshnessWindowSeconds?: number;
 }
 export interface Measurement {
   id: string;
@@ -28,6 +33,11 @@ export interface Measurement {
   environmentalVariable: EnvironmentalVariable;
   measuredValue: number;
   recordedAt: string;
+  receivedAt?: string;
+  source?: string;
+  freshness?: string;
+  capturedAgeSeconds?: number;
+  receivedAgeSeconds?: number;
 }
 export interface SafeRange {
   min: number;
@@ -46,6 +56,7 @@ export interface Deviation {
   safeRange: SafeRange;
 }
 export interface MonitoringSnapshot {
+  refreshFailed?: boolean;
   zones: MonitoringZone[];
   points: MonitoringPoint[];
   nodes: SensorNode[];

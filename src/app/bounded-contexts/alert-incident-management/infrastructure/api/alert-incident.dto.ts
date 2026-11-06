@@ -10,6 +10,7 @@ export interface AlertDto {
   raisedAt: string;
   acknowledgedAt: string | null;
   escalatedAt: string | null;
+  historical?: boolean;
 }
 export interface AcknowledgementDto {
   alertId: string;
@@ -26,4 +27,5 @@ export interface IncidentDetailDto {
   correctiveActions: CorrectiveAction[];
   withinSafeRange: boolean;
   resolutionAllowed: boolean;
+  resolutionBlockReasons?: string[];
 }

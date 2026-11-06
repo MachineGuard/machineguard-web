@@ -7,6 +7,11 @@ export interface MonitoringZoneViewModel {
   temperature: number | null;
   humidity: number | null;
   status: ZoneStatus;
+  freshness?: string;
+  temperatureSource?: string;
+  humiditySource?: string;
+  capturedAt?: string;
+  receivedAt?: string;
   minTemperature?: number;
   maxTemperature?: number;
   onlineNodes: number;

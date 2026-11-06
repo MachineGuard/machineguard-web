@@ -9,7 +9,11 @@ export class EnvironmentalMonitoringService {
   private readonly repository = inject(MONITORING_REPOSITORY);
   readonly state$ = defer(() => this.repository.watchSnapshot()).pipe(
     map((snapshot): MonitoringLoadState => {
-      const zones = snapshot.zones.map(zone => toMonitoringZoneViewModel(zone, snapshot));
+      const zones = snapshot.zones.map(zone => {
+        const view=toMonitoringZoneViewModel(zone,snapshot);
+        return snapshot.refreshFailed?{...view,status:'STALE' as const,freshness:'STALE'}:view;
+      });
+      if (snapshot.refreshFailed) return {status:'error',zones,error:new Error('Refresh unavailable')};
       return { status: zones.length ? 'loaded' : 'empty', zones };
     }),
     catchError((error: unknown) => of<MonitoringLoadState>({ status: 'error', zones: [], error })),

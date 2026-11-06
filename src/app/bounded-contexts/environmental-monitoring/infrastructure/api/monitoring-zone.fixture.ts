@@ -4,7 +4,7 @@ import { MonitoringZoneDto } from './monitoring-zone.dto';
 export function zoneFixture(): MonitoringZoneDto {
   return {
     id: '00000000-0000-0000-0000-000000000010', organizationId: '00000000-0000-0000-0000-000000000001',
-    facilityId: null, name: 'Cold Room A', description: 'Storage', status: 'ACTIVE', environmentalCondition: 'OUT_OF_RANGE',
+    facilityId: null, name: 'Cold Room A', description: 'Storage', status: 'ACTIVE', freshness:'FRESH', environmentalCondition: 'OUT_OF_RANGE',
     sensorsOnline: 1, sensorsOffline: 0, sensorsInactive: 1, lastUpdatedAt: '2026-10-01T11:00:00Z',
     points: [{ id: 'p1', name: 'Shelf A', location: null, status: 'ACTIVE' }],
     sensors: [

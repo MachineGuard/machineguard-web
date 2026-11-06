@@ -29,7 +29,21 @@ describe('Core zones REST mapping', () => {
     const dto = zoneFixture(); dto.environmentalCondition = 'NO_DATA'; dto.description = null; dto.lastUpdatedAt = null;
     dto.latestMeasurements = []; dto.sensors.forEach(node => node.lastMeasurementAt = null);
     const snapshot = zonesToMonitoringSnapshot([dto]); const vm = toMonitoringZoneViewModel(snapshot.zones[0], snapshot);
-    expect(vm.status).toBe('OFFLINE'); expect(vm.temperature).toBeNull(); expect(vm.humidity).toBeNull();
+    expect(vm.status).toBe('NO_DATA'); expect(vm.temperature).toBeNull(); expect(vm.humidity).toBeNull();
     expect(vm.lastSeenAt).toBeUndefined(); expect(vm.offlineMinutes).toBeUndefined();
   });
+  it('F4 displays fresh physical evidence ahead of a newer manual row',()=>{
+    const dto=zoneFixture() as any;dto.environmentalCondition='NORMAL';dto.freshness='FRESH';
+    dto.latestPhysicalMeasurements=[{...dto.latestMeasurements[0],measuredValue:5,source:'SENSOR',freshness:'FRESH'}];
+    dto.latestMeasurements[0]={...dto.latestMeasurements[0],measuredValue:25,source:'MANUAL',freshness:'NON_SENSOR'};
+    const snapshot=zonesToMonitoringSnapshot([dto]);const view=toMonitoringZoneViewModel(snapshot.zones[0],snapshot);
+    expect(view.temperature).toBe(5);expect((view as any).temperatureSource).toBe('SENSOR');
+  });
+  it('F4 keeps unknown and stale server states explicit',()=>{
+    const dto=zoneFixture() as any;dto.environmentalCondition='UNRECOGNIZED';
+    let snapshot=zonesToMonitoringSnapshot([dto]);expect(snapshot.zones[0].reportedStatus as string).toBe('UNKNOWN');
+    dto.environmentalCondition='STALE';snapshot=zonesToMonitoringSnapshot([dto]);
+    expect(snapshot.zones[0].reportedStatus as string).toBe('STALE');
+  });
+
 });

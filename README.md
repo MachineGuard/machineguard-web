@@ -2,6 +2,11 @@
 
 Frontend Core sobre el proyecto existente Angular 18.2, standalone, TypeScript y SCSS. El modo predeterminado consume IAM, Monitoring, Alert & Incident y Traceability mediante HTTP; los datos de demostraci贸n se habilitan con `npm run start:mock`. Sin SSR ni dependencias nuevas.
 
+Las tarjetas y el detalle muestran datos obsoletos y el origen de las lecturas.
+El detalle del incidente explica los bloqueos de resoluci髇 y distingue el estado
+hist髍ico/actual del mensaje original. Core revalida cada cierre; si lo rechaza,
+la Web conserva el texto escrito. El rol VIEWER sigue siendo de consulta.
+
 El [flujo de alertas e incidentes](docs/alert-incident-workflow.md) documenta las consultas, permisos, atenci贸n, recuperaci贸n y pruebas reales. Las notas de la maqueta inicial que siguen describen 煤nicamente su modo mock; las rutas actuales de zonas, alertas, incidentes y reportes ya tienen implementaci贸n.
 
 ## Ejecutar

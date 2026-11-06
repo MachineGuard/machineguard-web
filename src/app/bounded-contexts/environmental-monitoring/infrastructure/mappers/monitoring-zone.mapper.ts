@@ -6,7 +6,9 @@ export function zonesToMonitoringSnapshot(zones: MonitoringZoneDto[]): Monitorin
   return {
     zones: zones.map(zone => ({
       id: zone.id, name: zone.name, description: zone.description ?? '',
-      reportedStatus: zone.environmentalCondition === 'NO_DATA' ? 'OFFLINE' : zone.environmentalCondition,
+      reportedStatus: ['NORMAL','NEAR_LIMIT','OUT_OF_RANGE','OFFLINE','STALE','NO_DATA'].includes(zone.environmentalCondition)
+        ? (['NORMAL','NEAR_LIMIT'].includes(zone.environmentalCondition) && zone.freshness !== 'FRESH' ? 'UNKNOWN' : zone.environmentalCondition) : 'UNKNOWN',
+      freshness: zone.freshness ?? 'UNKNOWN',
       lastUpdatedAt: zone.lastUpdatedAt ?? undefined,
       sensorCounts: { online: zone.sensorsOnline, offline: zone.sensorsOffline },
     })),
@@ -15,18 +17,26 @@ export function zonesToMonitoringSnapshot(zones: MonitoringZoneDto[]): Monitorin
     }))),
     nodes: zones.flatMap(zone => zone.sensors.map(node => ({
       id: node.id, monitoringPointId: node.monitoringPointId, status: node.status,
-      lastSeenAt: node.lastMeasurementAt ?? undefined,
+      lastSeenAt: node.lastReceivedAt ?? undefined, administrativeStatus: node.administrativeStatus,
+      availability: node.availability, receivedAgeSeconds: node.receivedAgeSeconds ?? undefined, freshnessWindowSeconds: node.freshnessWindowSeconds,
     }))),
     thresholds: zones.flatMap(zone => zone.thresholds.map(threshold => ({
       id: threshold.id, monitoringZoneId: zone.id,
       environmentalVariable: toVariable(threshold.environmentalVariable),
       safeRange: { min: threshold.minimumValue, max: threshold.maximumValue },
     }))),
-    measurements: zones.flatMap(zone => zone.latestMeasurements.map(reading => ({
+    measurements: zones.flatMap(zone => {
+      const physical=(zone.latestPhysicalMeasurements ?? []).filter(reading=>zone.sensors.some(n=>n.id===reading.sensorNodeId && n.status!=='INACTIVE')
+        && zone.points.some(p=>p.id===reading.monitoringPointId && p.status==='ACTIVE'));
+      const current=physical.filter(reading=>reading.freshness==='FRESH');
+      const readings=current.length?current:physical.length?physical:zone.latestMeasurements;
+      return readings.map(reading => ({
       id: reading.id, organizationId: reading.organizationId, monitoringZoneId: reading.monitoringZoneId,
       monitoringPointId: reading.monitoringPointId, environmentalVariable: toVariable(reading.environmentalVariable),
-      measuredValue: reading.measuredValue, recordedAt: reading.recordedAt,
-    }))),
+      measuredValue: reading.measuredValue, recordedAt: reading.recordedAt, receivedAt: reading.receivedAt,
+      source: reading.source ?? 'LEGACY_UNKNOWN', freshness: reading.freshness ?? 'UNKNOWN',
+      capturedAgeSeconds: reading.capturedAgeSeconds, receivedAgeSeconds: reading.receivedAgeSeconds,
+    }));}),
   };
 }
 function toVariable(variable: EnvironmentalVariableDto) {

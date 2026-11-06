@@ -10,6 +10,7 @@
     [monospace]="true"
     [solid]="zone.status === 'OUT_OF_RANGE'"
   />
+  @if (zone.freshness && zone.freshness !== 'FRESH' && !['STALE','NO_DATA','UNKNOWN'].includes(zone.status)) { <p role="status">{{ 'monitoring.notCurrent' | t }}</p> }
   <div class="measurements">
     <span class="sr-only">{{ "variable.TEMPERATURE" | t }}</span>
     <p class="temperature mono">
@@ -36,7 +37,9 @@
     <div class="offline-rule"></div>
   }
   <div class="zone-information">
-    @if (zone.status === "OFFLINE") {
+    @if (['STALE','NO_DATA','UNKNOWN'].includes(zone.status)) {
+      <p role="status">{{ 'monitoring.notCurrent' | t }}</p>
+    } @else if (zone.status === "OFFLINE") {
       <p>{{ "card.offlineFor" | t: { n: zone.offlineMinutes ?? 0 } }}</p>
     } @else if (zone.status === "OUT_OF_RANGE") {
       <p class="condition-note">

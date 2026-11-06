@@ -37,7 +37,7 @@ export function toMonitoringZoneViewModel(
           ? zone.reportedStatus !== 'OFFLINE'
           : onlinePointIds.has(m.monitoringPointId)),
     )
-    .sort((a, b) => Date.parse(b.recordedAt) - Date.parse(a.recordedAt));
+    .sort(newestFirst);
   const temperature = measurements.find(
     (m) => m.environmentalVariable === 'TEMPERATURE',
   );
@@ -110,6 +110,8 @@ export function toMonitoringZoneViewModel(
   return {
     ...zone,
     temperature: temperature?.measuredValue ?? null,
+    freshness: zone.freshness,temperatureSource:temperature?.source,humiditySource:humidity?.source,
+    capturedAt:temperature?.recordedAt,receivedAt:temperature?.receivedAt,
     humidity: humidity?.measuredValue ?? null,
     status,
     minTemperature: temperatureRange?.min,
@@ -178,4 +180,15 @@ export function toMonitoringZoneViewModel(
         };
       }),
   };
+}
+
+/** Date.parse drops sub-millisecond digits; preserve Core's capture precision. */
+export function newestFirst(a: Pick<Measurement,'recordedAt'|'receivedAt'>,b: Pick<Measurement,'recordedAt'|'receivedAt'>):number {
+  const remainder=(iso:string)=>Number((iso.match(/\.(\d+)/)?.[1] ?? '').padEnd(9,'0').slice(3,9));
+  for (const field of ['recordedAt','receivedAt'] as const) {
+    const left=a[field],right=b[field];if(!left || !right)continue;
+    const difference=Date.parse(right)-Date.parse(left) || remainder(right)-remainder(left);
+    if(difference)return difference;
+  }
+  return 0;
 }

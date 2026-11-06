@@ -25,11 +25,12 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent {
-  readonly systemStatus$ = inject(EnvironmentalMonitoringService).zones$.pipe(
-    map((zones) => ({
-      online: zones.reduce((count, zone) => count + zone.onlineNodes, 0),
-      offline: zones.reduce((count, zone) => count + zone.offlineNodes, 0),
-      total: zones.reduce(
+  readonly systemStatus$ = inject(EnvironmentalMonitoringService).state$.pipe(
+    map((state) => ({
+      unconfirmed:state.status==='error' || state.status==='loading',
+      online: state.zones.reduce((count, zone) => count + zone.onlineNodes, 0),
+      offline: state.zones.reduce((count, zone) => count + zone.offlineNodes, 0),
+      total: state.zones.reduce(
         (count, zone) => count + zone.onlineNodes + zone.offlineNodes,
         0,
       ),
