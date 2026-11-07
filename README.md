@@ -60,3 +60,4 @@ docs/              Documentación detallada
 - [Interfaz](docs/interfaz.md): dashboard, idiomas y diseño visual.
 - [Pruebas y validación](docs/pruebas.md): build, pruebas, auditoría y validación de la integración.
 - [Flujo de alertas e incidentes](docs/alert-incident-workflow.md): consultas, permisos, atención y recuperación.
+- [Activación de cuenta](docs/activacion.md): enlace de invitación, contraseña y la pantalla `/activate`.
