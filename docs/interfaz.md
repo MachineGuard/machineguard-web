@@ -8,6 +8,7 @@
 - `View details` e `Inspect` abren un diálogo con las condiciones actuales.
 - El contador **Updated** muestra la antigüedad de la última lectura. Avanza con un
   temporizador de presentación. No inventa mediciones.
+- En modo HTTP, las zonas, alertas e incidentes se vuelven a pedir a Core cada 15 s.
 - Las barras del gráfico usan alturas relativas al Safe Range y colores según los
   thresholds. En modo HTTP muestran una lectura actual (ver [integración](integracion-core.md)).
 
