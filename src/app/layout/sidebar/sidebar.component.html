@@ -7,6 +7,7 @@
       <a
         [routerLink]="link.path"
         routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: link.path === '/reports' }"
         ariaCurrentWhenActive="page"
         (click)="navigated.emit()"
         ><app-icon [name]="link.icon" />{{ link.label | t }}</a

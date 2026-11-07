@@ -58,6 +58,18 @@ export const routes: Routes = [
         loadComponent: () => import('./bounded-contexts/alert-incident-management/presentation/pages/incident-detail/incident-detail.component').then(m => m.IncidentDetailComponent),
       },
       {
+        path: 'history', title: 'trace.history',
+        loadComponent: () => import('./bounded-contexts/traceability-quality/presentation/pages/measurement-history/measurement-history.component').then(m => m.MeasurementHistoryComponent),
+      },
+      {
+        path: 'reports/sealed', title: 'trace.reports',
+        loadComponent: () => import('./bounded-contexts/traceability-quality/presentation/pages/sealed-reports/sealed-reports.component').then(m => m.SealedReportsComponent),
+      },
+      {
+        path: 'reports/sealed/:reportId', title: 'trace.reportDetail',
+        loadComponent: () => import('./bounded-contexts/traceability-quality/presentation/pages/sealed-report-detail/sealed-report-detail.component').then(m => m.SealedReportDetailComponent),
+      },
+      {
         path: 'reports',
         title: 'title.reports',
         loadComponent: () =>

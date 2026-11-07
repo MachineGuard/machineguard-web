@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_CONFIG } from '../config/api.config';
 
@@ -12,6 +12,9 @@ export class ApiClient {
   }
   post<T>(path: string, body: unknown): Observable<T> {
     return this.http.post<T>(this.url(path), body);
+  }
+  download(path: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(this.url(path), { observe: 'response', responseType: 'blob' });
   }
   put<T>(path: string, body: unknown): Observable<T> {
     return this.http.put<T>(this.url(path), body);

@@ -1,0 +1,32 @@
+<div class="page">
+  <h1>{{ 'trace.reports' | t }}</h1>
+  <nav class="filters" [attr.aria-label]="'trace.navigation' | t"><a routerLink="/reports">{{ 'trace.excursions' | t }}</a><a routerLink="/history">{{ 'trace.history' | t }}</a></nav>
+  <p class="lead">{{ 'trace.sealHelp' | t }}</p>
+  @if (mock) { <p class="callout" role="status">{{ 'trace.connectionRequired' | t }}</p> }
+  @else {
+    @if (zonesError()) { <p role="alert">{{ zonesError() | t }} <button class="button compact" (click)="loadZones()">{{ 'common.retry' | t }}</button></p> }
+    <form class="filters" (ngSubmit)="load()"><div><label for="reports-zone">{{ 'trace.zone' | t }}</label><select id="reports-zone" name="filter" [(ngModel)]="filter"><option value="">{{ 'header.allZones' | t }}</option>@for (z of zones(); track z.id) { <option [value]="z.id">{{ z.name }}</option> }</select></div><button class="button secondary compact" type="submit" [disabled]="loading()">{{ 'trace.refresh' | t }}</button></form>
+    @if (canGenerate()) {
+      <section class="panel padded" aria-labelledby="generate-title">
+        <h2 id="generate-title">{{ 'trace.generate' | t }}</h2>
+        <form (ngSubmit)="generate()">
+          <fieldset [disabled]="busy()" style="border:0;padding:0;margin:0"><div class="filters">
+            <div><label for="generate-zone">{{ 'trace.zone' | t }}</label><select id="generate-zone" name="zone" [(ngModel)]="zone" required><option value="">{{ 'trace.selectZone' | t }}</option>@for (z of zones(); track z.id) { <option [value]="z.id">{{ z.name }}</option> }</select></div>
+            <div><label for="generate-from">{{ 'trace.from' | t }}</label><input id="generate-from" name="from" type="datetime-local" [(ngModel)]="from" required></div>
+            <div><label for="generate-to">{{ 'trace.to' | t }}</label><input id="generate-to" name="to" type="datetime-local" [(ngModel)]="to" required></div>
+          </div><p class="muted">{{ 'trace.localDates' | t }}</p>
+          <label><input id="generate-confirm" name="confirmed" type="checkbox" [(ngModel)]="confirmed"> {{ 'trace.confirmSeal' | t }}</label>
+          <p><button class="button primary compact" type="submit" [disabled]="!confirmed">{{ (busy() ? 'trace.sending' : 'trace.generate') | t }}</button></p></fieldset>
+        </form>
+        @if (commandError()) { <p class="callout error" role="alert">{{ commandError() | t }}</p><p>{{ (uncertain() ? 'trace.uncertain' : 'trace.commandFailed') | t }}</p><button class="button secondary compact" (click)="load()">{{ 'trace.refresh' | t }}</button> }
+        @if (generated(); as report) { <p class="callout" role="status">{{ 'trace.created' | t }} <a [routerLink]="['/reports/sealed', report.id]">{{ report.id }}</a></p> }
+      </section>
+    } @else { <p class="muted">{{ 'trace.viewer' | t }}</p> }
+    @if (loading()) { <p role="status">{{ 'trace.loading' | t }}</p> }
+    @if (error()) { <p class="callout error" role="alert">{{ error() | t }}</p> }
+    @if (!loading() && !error()) {
+      @if (!reports().length) { <p class="panel state">{{ 'trace.emptyReports' | t }}</p> }
+      @else { <div class="panel table-scroll"><table class="data-table"><thead><tr><th scope="col">{{ 'trace.zone' | t }}</th><th scope="col">{{ 'trace.period' | t }}</th><th scope="col">{{ 'trace.generatedAt' | t }}</th><th scope="col">{{ 'trace.count' | t }}</th><th scope="col">{{ 'trace.status' | t }}</th></tr></thead><tbody>@for (r of reports(); track r.id) { <tr><td><a [routerLink]="['/reports/sealed', r.id]">{{ zoneName(r.monitoringZoneId) }}</a><small>{{ r.id }}</small></td><td>{{ r.periodStart }} → {{ r.periodEnd }}</td><td>{{ r.generatedAt }}</td><td>{{ 'trace.measurements' | t }}: {{ r.measurementCount }}<br>{{ 'trace.excursions' | t }}: {{ r.excursionCount }}</td><td>{{ r.status }}<br>{{ (r.integrityVerified ? 'trace.verified' : 'trace.integrityError') | t }}<small style="overflow-wrap:anywhere">{{ r.checksum }}</small></td></tr> }</tbody></table></div> }
+    }
+  }
+</div>
