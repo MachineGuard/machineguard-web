@@ -17,6 +17,14 @@ export const routes: Routes = [
       ).then((m) => m.LoginComponent),
   },
   {
+    path: 'activate',
+    title: 'title.activate',
+    loadComponent: () =>
+      import(
+        './bounded-contexts/iam/presentation/pages/activate/activate.component'
+      ).then((m) => m.ActivateComponent),
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard],

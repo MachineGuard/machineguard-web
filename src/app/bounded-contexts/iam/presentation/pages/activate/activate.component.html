@@ -1,0 +1,87 @@
+<div class="activate">
+  <app-login-showcase class="showcase" aria-hidden="true" />
+
+  <main class="panel">
+    <div class="brand compact">
+      <span class="brand-mark"><app-icon name="shield" /></span>MachineGuard
+    </div>
+
+    <section class="card" aria-labelledby="activate-title">
+      @if (completed()) {
+        <div class="state" role="status">
+          <span class="state-icon"><app-icon name="check-circle" /></span>
+          <h1 id="activate-title">{{ "activate.success.title" | t }}</h1>
+          <p class="lead">{{ "activate.success" | t }}</p>
+          <a class="button primary submit" routerLink="/login">
+            {{ "activate.goLogin" | t }}
+            <app-icon name="arrow" />
+          </a>
+        </div>
+      } @else if (tokenMissing() || tokenRejected()) {
+        <div class="state" role="alert">
+          <span class="state-icon danger"><app-icon name="error" /></span>
+          <h1 id="activate-title">{{ "activate.unavailable" | t }}</h1>
+          <p class="lead">
+            {{ (tokenMissing() ? "activate.missingToken" : "activate.error.invalidToken") | t }}
+          </p>
+          <a class="button primary submit" routerLink="/login">{{ "activate.backToLogin" | t }}</a>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <h1 id="activate-title">{{ "activate.title" | t }}</h1>
+          <p class="lead">{{ "activate.lead" | t }}</p>
+
+          @if (error(); as message) {
+            <p class="form-error" role="alert">
+              <app-icon name="error" />{{ message | t }}
+            </p>
+          }
+
+          <label for="password">{{ "activate.password" | t }}</label>
+          <div class="control" [class.invalid]="passwordErrorKey()">
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              autocomplete="new-password"
+              [attr.aria-invalid]="passwordErrorKey() !== null"
+              aria-describedby="password-rules password-error"
+            />
+          </div>
+          <p class="hint" id="password-rules">{{ "activate.rules" | t }}</p>
+          @if (passwordErrorKey(); as key) {
+            <p class="field-error" id="password-error">{{ key | t }}</p>
+          }
+
+          <label for="confirmPassword">{{ "activate.confirmPassword" | t }}</label>
+          <div class="control" [class.invalid]="confirmErrorKey()">
+            <input
+              id="confirmPassword"
+              type="password"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+              [attr.aria-invalid]="confirmErrorKey() !== null"
+              aria-describedby="confirm-error"
+            />
+          </div>
+          @if (confirmErrorKey(); as key) {
+            <p class="field-error" id="confirm-error">{{ key | t }}</p>
+          }
+
+          <button class="button primary submit" type="submit" [disabled]="submitting()">
+            {{ (submitting() ? "activate.submitting" : "activate.submit") | t }}
+            @if (!submitting()) {
+              <app-icon name="arrow" />
+            }
+          </button>
+        </form>
+      }
+    </section>
+
+    <footer>
+      <span>{{ "common.terms" | t }}</span><span aria-hidden="true">&middot;</span
+      ><span>{{ "common.privacy" | t }}</span><span aria-hidden="true">&middot;</span
+      ><app-language-switch />
+    </footer>
+  </main>
+</div>
