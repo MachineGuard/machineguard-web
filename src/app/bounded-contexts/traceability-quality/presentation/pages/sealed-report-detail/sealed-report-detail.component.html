@@ -1,0 +1,28 @@
+<div class="page">
+  <a routerLink="/reports/sealed">{{ 'trace.backReports' | t }}</a>
+  <h1>{{ 'trace.reportDetail' | t }}</h1>
+  @if (mock) { <p class="callout" role="status">{{ 'trace.connectionRequired' | t }}</p> }
+  @if (loading()) { <p role="status">{{ 'trace.loading' | t }}</p> }
+  @if (error()) { <p class="callout error" role="alert">{{ error() | t }}</p> }
+  @if (report(); as r) {
+    <section class="panel padded">
+      <h2>{{ r.id }}</h2>
+      <dl class="facts">
+        <div><dt>{{ 'trace.zone' | t }}</dt><dd>{{ r.monitoringZoneId }}</dd></div>
+        <div><dt>{{ 'trace.period' | t }}</dt><dd>{{ r.periodStart }} → {{ r.periodEnd }}</dd></div>
+        <div><dt>{{ 'trace.generatedAt' | t }}</dt><dd>{{ r.generatedAt }}</dd></div>
+        <div><dt>{{ 'trace.author' | t }}</dt><dd>{{ r.generatedBy }}</dd></div>
+        <div><dt>{{ 'trace.measurements' | t }}</dt><dd>{{ r.measurementCount }}</dd></div>
+        <div><dt>{{ 'trace.excursions' | t }}</dt><dd>{{ r.excursionCount }}</dd></div>
+        <div><dt>{{ 'trace.status' | t }}</dt><dd>{{ r.status }}</dd></div>
+        <div><dt>{{ 'trace.checksum' | t }}</dt><dd style="overflow-wrap:anywhere">{{ r.checksum }}</dd></div>
+      </dl>
+      <p [class]="r.integrityVerified ? 'callout' : 'callout error'" role="status">{{ (r.integrityVerified ? 'trace.verified' : 'trace.integrityError') | t }}</p>
+      <p>{{ 'trace.checksumHelp' | t }}</p>
+      <button class="button primary compact" (click)="download()" [disabled]="busy() || !r.integrityVerified">{{ (busy() ? 'trace.loading' : 'trace.download') | t }}</button>
+      @if (downloadError()) { <p class="callout error" role="alert">{{ downloadError() | t }}</p> }
+      @if (downloaded()) { <p role="status">{{ 'trace.downloaded' | t }}</p> }
+    </section>
+    <section aria-labelledby="content-title"><h2 id="content-title">{{ 'trace.content' | t }}</h2><pre class="panel padded" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ content(r) }}</pre></section>
+  }
+</div>

@@ -43,6 +43,8 @@ export class SidebarComponent {
     { label: 'nav.alerts', path: '/alerts', icon: 'alerts' },
     { label: 'nav.incidents', path: '/incidents', icon: 'incidents' },
     { label: 'nav.reports', path: '/reports', icon: 'reports' },
+    { label: 'trace.history', path: '/history', icon: 'reports' },
+    { label: 'trace.reports', path: '/reports/sealed', icon: 'reports' },
     { label: 'nav.devices', path: '/devices', icon: 'devices' },
   ];
 }

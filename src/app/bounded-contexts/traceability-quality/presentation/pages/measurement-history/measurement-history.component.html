@@ -1,0 +1,29 @@
+<div class="page">
+  <h1>{{ 'trace.history' | t }}</h1>
+  <nav class="filters" [attr.aria-label]="'trace.navigation' | t"><a routerLink="/reports">{{ 'trace.excursions' | t }}</a><a routerLink="/reports/sealed">{{ 'trace.reports' | t }}</a></nav>
+  <p class="lead">{{ 'trace.historyHelp' | t }}</p>
+  @if (mock) { <p class="callout" role="status">{{ 'trace.connectionRequired' | t }}</p> }
+  @else {
+    @if (zonesError()) { <p role="alert">{{ zonesError() | t }} <button class="button compact" (click)="loadZones()">{{ 'common.retry' | t }}</button></p> }
+    <form class="filters" (ngSubmit)="search()">
+      <div><label for="history-zone">{{ 'trace.zone' | t }}</label><select id="history-zone" name="zone" [(ngModel)]="zone" required><option value="">{{ 'trace.selectZone' | t }}</option>@for (z of zones(); track z.id) { <option [value]="z.id">{{ z.name }}</option> }</select></div>
+      <div><label for="history-from">{{ 'trace.from' | t }}</label><input id="history-from" name="from" type="datetime-local" [(ngModel)]="from" required></div>
+      <div><label for="history-to">{{ 'trace.to' | t }}</label><input id="history-to" name="to" type="datetime-local" [(ngModel)]="to" required></div>
+      <div><label for="history-variable">{{ 'trace.variable' | t }}</label><select id="history-variable" name="variable" [(ngModel)]="variable"><option value="">{{ 'trace.allVariables' | t }}</option><option value="TEMPERATURE">{{ 'variable.TEMPERATURE' | t }}</option><option value="HUMIDITY">{{ 'variable.HUMIDITY' | t }}</option></select></div>
+      <button class="button primary compact" type="submit" [disabled]="loading()">{{ 'trace.search' | t }}</button>
+    </form>
+    <p class="muted">{{ 'trace.localDates' | t }}</p>
+    @if (loading()) { <p role="status">{{ 'trace.loading' | t }}</p> }
+    @if (error()) { <p class="callout error" role="alert">{{ error() | t }}</p> }
+    @if (data(); as history) {
+      <p role="status">{{ 'trace.count' | t }}: {{ history.count }}</p>
+      <p>{{ history.from }} → {{ history.to }} (UTC)</p>
+      @if (!history.measurements.length) { <p class="panel state">{{ 'trace.emptyHistory' | t }}</p> }
+      @else {
+        <div class="panel table-scroll"><table class="data-table"><thead><tr><th scope="col">{{ 'trace.instant' | t }}</th><th scope="col">{{ 'trace.point' | t }}</th><th scope="col">{{ 'trace.variable' | t }}</th><th scope="col">{{ 'trace.value' | t }}</th></tr></thead>
+          <tbody>@for (m of history.measurements; track $index) { <tr><td><time [attr.datetime]="m.recordedAt">{{ m.recordedAt }}</time></td><td>{{ pointName(m.monitoringPointId) }}</td><td>{{ ('variable.' + m.environmentalVariable) | t }}</td><td>{{ m.value }} {{ units[m.environmentalVariable] }}</td></tr> }</tbody>
+        </table></div>
+      }
+    }
+  }
+</div>
