@@ -62,4 +62,25 @@ describe('API JWT interceptor', () => {
     expect(get.request.headers.get('Authorization')).toBe('Bearer expired-token');
     get.flush({});
   });
+
+  it('omits Bearer only for the exact invitation acceptance POST', () => {
+    TestBed.inject(AuthContextService).setContext({ accessToken: 'expired-token', organizationId: 'org', userId: 'user' });
+    const base = 'http://localhost:8080/api/v1';
+    const accept = `${base}/auth/invitations/accept`;
+    http.post(accept, { token: 'invitation-token', password: 'password-of-12' }).subscribe();
+    const request = controller.expectOne(accept);
+    expect(request.request.headers.has('Authorization')).toBeFalse();
+    request.flush({ message: 'ok' });
+    for (const [method, url] of [
+      ['POST', `${base}/auth/invitations/accept/`],
+      ['POST', `${base}/auth/invitations/accept-extra`],
+      ['POST', `${base}/auth/invitations`],
+      ['GET', accept],
+    ] as const) {
+      http.request(method, url, { body: {} }).subscribe();
+      const protectedRequest = controller.expectOne(url);
+      expect(protectedRequest.request.headers.get('Authorization')).withContext(`${method} ${url}`).toBe('Bearer expired-token');
+      protectedRequest.flush({});
+    }
+  });
 });
