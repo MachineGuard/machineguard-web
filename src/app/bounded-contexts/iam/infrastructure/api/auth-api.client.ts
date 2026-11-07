@@ -11,10 +11,16 @@ export interface AuthenticationDto {
   organization: { id: string; name: string };
 }
 
+/** Core answers 201 with a message only: activation does not start a session. */
+export interface InvitationAcceptedDto {
+  message: string;
+}
+
 export const AUTH_PATHS = {
   login: 'auth/login',
   refresh: 'auth/refresh',
   logout: 'auth/logout',
+  acceptInvitation: 'auth/invitations/accept',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +38,11 @@ export class AuthApiClient {
 
   logout(refreshToken: string): Observable<void> {
     return this.api.post<void>(AUTH_PATHS.logout, { refreshToken });
+  }
+
+  /** Public call: the invitation token is the credential, so no Bearer header is sent. */
+  acceptInvitation(token: string, password: string): Observable<InvitationAcceptedDto> {
+    return this.api.post<InvitationAcceptedDto>(AUTH_PATHS.acceptInvitation, { token, password });
   }
 }
 
