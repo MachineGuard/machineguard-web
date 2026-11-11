@@ -52,6 +52,10 @@ export class I18nService {
     return this.t(`${key}.${count === 1 ? 'one' : 'other'}`, { ...params, n: count });
   }
 
+  number(value: number): string {
+    return new Intl.NumberFormat(LOCALES[this.current()], { maximumFractionDigits: 2 }).format(value);
+  }
+
   dateTime(iso: string): string {
     return this.dateTimeFormat().format(new Date(iso)).replace(',', '');
   }

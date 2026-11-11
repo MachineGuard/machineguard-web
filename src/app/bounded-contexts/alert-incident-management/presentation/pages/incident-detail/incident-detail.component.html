@@ -13,7 +13,7 @@
         @if (alert.escalatedAt) { <p class="callout error" role="status">{{ 'incident.escalatedOn' | t }} <time [attr.datetime]="alert.escalatedAt">{{ i18n.dateTime(alert.escalatedAt) }}</time></p> }
       }
       <p role="status">{{ (d.incident.historical === true ? 'incident.historical' : d.incident.historical === false ? 'incident.current' : 'incident.originUnknown') | t }}</p>
-      @if (d.alert) { <p class="alert-message"><strong>{{ 'incident.originMessage' | t }}</strong> {{ d.alert.message }}</p> }
+      @if (d.alert) { <p class="alert-message"><strong>{{ 'incident.originMessage' | t }}</strong> {{ alertMessage() }}</p> }
       <dl class="facts"><div><dt>{{ 'operations.opened' | t }}</dt><dd><time [attr.datetime]="d.incident.openedAt">{{ i18n.dateTime(d.incident.openedAt) }}</time></dd></div><div><dt>{{ 'incident.identifier' | t }}</dt><dd class="identifier">{{ d.incident.id }}</dd></div></dl>
       @if (active()) { <p class="callout">{{ (loadError() ? 'monitoring.notCurrent' : d.withinSafeRange ? 'incident.safe' : 'incident.unsafe') | t }}</p> }
       @if (!canManage()) { <p class="muted">{{ 'incident.viewer' | t }}</p> }

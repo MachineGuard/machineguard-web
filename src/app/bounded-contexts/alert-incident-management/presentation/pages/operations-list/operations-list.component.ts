@@ -9,10 +9,10 @@ import { StatusBadgeComponent } from '../../../../../shared/components/status-ba
 import { EnvironmentalMonitoringService } from '../../../../environmental-monitoring/application/services/environmental-monitoring.service';
 import { AlertService } from '../../../application/services/alert.service';
 import { IncidentService } from '../../../application/services/incident.service';
-import { AlertStatus, IncidentStatus } from '../../../domain/models/alert.models';
-import { incidentTone } from '../../incident.presentation';
+import { Alert, AlertStatus, IncidentStatus } from '../../../domain/models/alert.models';
+import { alertText, incidentTone } from '../../incident.presentation';
 
-interface OperationRow { id: string; zoneId: string; status: string; date: string; description: string; incidentId?: string; severity?: string; historical?: boolean; }
+interface OperationRow { id: string; zoneId: string; status: string; date: string; description: string; incidentId?: string; severity?: string; historical?: boolean; alert?: Alert; }
 
 @Component({
     selector: 'app-operations-list',
@@ -41,6 +41,7 @@ export class OperationsListComponent {
   readonly statuses = this.isAlerts ? ['PENDING', 'ACKNOWLEDGED', 'ESCALATED', 'CLOSED'] : ['OPEN', 'ACKNOWLEDGED', 'ESCALATED', 'RESOLVED'];
   readonly filtered = computed(() => !!(this.zoneFilter() || this.statusFilter() || this.from() || this.to()));
   readonly tone = incidentTone;
+  text(row: OperationRow): string { return row.alert ? alertText(row.alert, this.i18n) : row.description; }
 
   constructor() {
     this.reload.pipe(switchMap(() => timer(0, 15_000).pipe(switchMap(() => {
@@ -49,7 +50,7 @@ export class OperationsListComponent {
       const request: Observable<OperationRow[]> = this.isAlerts
         ? this.alerts.list({ monitoringZoneId, status: (this.applied.status || undefined) as AlertStatus | undefined }).pipe(
           map(items => items.map(a => ({ id: a.id, zoneId: a.monitoringZoneId, status: a.status, date: a.raisedAt,
-            historical:a.historical,description: a.message, incidentId: a.incidentId, severity: a.severityLevel ?? a.severity }))))
+            historical:a.historical,description: a.message, incidentId: a.incidentId, severity: a.severityLevel ?? a.severity, alert: a }))))
         : this.incidents.list({ monitoringZoneId, status: (this.applied.status || undefined) as IncidentStatus | undefined,
           from: this.applied.from || undefined, to: this.applied.to || undefined }).pipe(
           map(items => items.map(i => ({ id: i.id, zoneId: i.monitoringZoneId, status: i.status, date: i.openedAt,

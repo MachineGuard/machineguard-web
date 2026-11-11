@@ -14,6 +14,9 @@ export function alertFromDto(dto: AlertDto): Alert {
     zoneName: dto.monitoringZoneId, severity: VISUAL_SEVERITY[dto.severity], severityLevel: dto.severity,
     historical:dto.historical,status: dto.status, message: dto.message, raisedAt: dto.raisedAt,
     escalatedAt: dto.escalatedAt ?? null,
+    reading: dto.environmentalVariable && dto.measuredValue != null && dto.minimumValue != null && dto.maximumValue != null
+      ? { variable: dto.environmentalVariable, value: Number(dto.measuredValue), minimum: Number(dto.minimumValue), maximum: Number(dto.maximumValue) }
+      : null,
   };
 }
 export function acknowledgementFromDto(dto: AcknowledgementDto): Acknowledgement {

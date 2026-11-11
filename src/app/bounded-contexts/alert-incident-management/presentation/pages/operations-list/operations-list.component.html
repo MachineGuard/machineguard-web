@@ -25,7 +25,7 @@
             <div class="record-main">
               @if (row.incidentId) { <a class="row-link" [routerLink]="['/incidents', row.incidentId]">{{ zoneName(row.zoneId) }}</a> } @else { <strong>{{ zoneName(row.zoneId) }}</strong> }
               <p>{{ (row.historical === true ? 'incident.historical' : row.historical === false ? 'incident.current' : 'incident.originUnknown') | t }}</p>
-              <p>{{ isAlerts ? row.description : (('variable.' + row.description) | t) }}</p>
+              <p>{{ isAlerts ? text(row) : (('variable.' + row.description) | t) }}</p>
               <span class="muted">{{ (isAlerts ? 'operations.raised' : 'operations.opened') | t }} <time [attr.datetime]="row.date">{{ i18n.dateTime(row.date) }}</time></span>
               @if (row.severity) { <span class="muted severity">{{ 'operations.severity' | t }}: {{ ('operations.severity.' + row.severity) | t }}</span> }
             </div>
