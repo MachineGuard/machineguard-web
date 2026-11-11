@@ -8,11 +8,27 @@
   @if (detail(); as d) {
     <section class="panel padded section" aria-labelledby="incident-summary">
       <div class="title-row"><h2 id="incident-summary">{{ ('variable.' + (d.incident.environmentalVariable ?? 'UNKNOWN')) | t }}</h2><app-status-badge [label]="('operations.status.' + d.incident.status) | t" [tone]="tone(d.incident.status)" /></div>
+      @if (d.alert; as alert) {
+        <p class="severity-line"><app-status-badge [label]="('operations.severity.' + (alert.severityLevel ?? alert.severity)) | t" [tone]="severityTone(alert.severity)" /><span>{{ 'incident.elapsed' | t }}: <strong>{{ elapsed() }}</strong></span></p>
+        @if (alert.escalatedAt) { <p class="callout error" role="status">{{ 'incident.escalatedOn' | t }} <time [attr.datetime]="alert.escalatedAt">{{ i18n.dateTime(alert.escalatedAt) }}</time></p> }
+      }
       <p role="status">{{ (d.incident.historical === true ? 'incident.historical' : d.incident.historical === false ? 'incident.current' : 'incident.originUnknown') | t }}</p>
       @if (d.alert) { <p class="alert-message"><strong>{{ 'incident.originMessage' | t }}</strong> {{ d.alert.message }}</p> }
       <dl class="facts"><div><dt>{{ 'operations.opened' | t }}</dt><dd><time [attr.datetime]="d.incident.openedAt">{{ i18n.dateTime(d.incident.openedAt) }}</time></dd></div><div><dt>{{ 'incident.identifier' | t }}</dt><dd class="identifier">{{ d.incident.id }}</dd></div></dl>
       @if (active()) { <p class="callout">{{ (loadError() ? 'monitoring.notCurrent' : d.withinSafeRange ? 'incident.safe' : 'incident.unsafe') | t }}</p> }
       @if (!canManage()) { <p class="muted">{{ 'incident.viewer' | t }}</p> }
+    </section>
+    <section class="section" aria-labelledby="timeline-title">
+      <h2 id="timeline-title">{{ 'incident.timeline' | t }}</h2>
+      <ol class="timeline">
+        @for (step of timeline(); track step.id) {
+          <li [class.done]="step.done"><span class="dot" aria-hidden="true"></span><div>
+            <p class="step-title">{{ ('incident.step.' + step.key) | t }}</p>
+            @if (step.detail) { <p class="muted step-detail">{{ step.detail }}</p> }
+            <p class="muted">@if (step.at) { <time [attr.datetime]="step.at">{{ i18n.dateTime(step.at) }}</time> } @else { <span>{{ 'incident.stepPending' | t }}</span> }</p>
+          </div></li>
+        }
+      </ol>
     </section>
     <section class="section" aria-labelledby="ack-title">
       <h2 id="ack-title">{{ 'incident.acknowledgement' | t }}</h2>

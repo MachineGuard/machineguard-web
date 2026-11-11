@@ -12,6 +12,7 @@ export interface Alert {
   severityLevel?: CoreAlertSeverity;
   status: AlertStatus;
   raisedAt: string;
+  escalatedAt?: string | null;
   contextNote?: string;
   historical?: boolean;
 }
