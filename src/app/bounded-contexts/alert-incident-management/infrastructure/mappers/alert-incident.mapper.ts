@@ -13,6 +13,7 @@ export function alertFromDto(dto: AlertDto): Alert {
     // The composition layer resolves the real zone name; an identifier is an honest interim fallback.
     zoneName: dto.monitoringZoneId, severity: VISUAL_SEVERITY[dto.severity], severityLevel: dto.severity,
     historical:dto.historical,status: dto.status, message: dto.message, raisedAt: dto.raisedAt,
+    escalatedAt: dto.escalatedAt ?? null,
   };
 }
 export function acknowledgementFromDto(dto: AcknowledgementDto): Acknowledgement {

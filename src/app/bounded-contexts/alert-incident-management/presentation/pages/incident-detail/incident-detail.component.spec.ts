@@ -75,5 +75,18 @@ describe('IncidentDetailComponent', () => {
     expect(fixture.componentInstance.resolutionNotes).toBe('Cooling checked');
     expect(fixture.componentInstance.actionError()).toBe('incident.conflict');fixture.destroy();
   }));
+  it('shows severity, elapsed time, escalation and the timeline', fakeAsync(() => {
+    const escalated = { ...DETAIL_FIXTURE, alert: { ...DETAIL_FIXTURE.alert!, escalatedAt: '2026-10-30T12:30:00Z' } };
+    service.detail.and.returnValue(of(incidentDetailFromDto(escalated as any)));
+    const fixture = TestBed.createComponent(IncidentDetailComponent); tick(0); fixture.detectChanges();
+    fixture.componentInstance.i18n.use('en'); fixture.detectChanges();
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('Timeline'); expect(text).toContain('Alert raised'); expect(text).toContain('Alert escalated');
+    expect(text).toContain('Elapsed'); expect(text).toContain('Escalated on');
+    expect(fixture.nativeElement.querySelectorAll('.timeline li').length).toBeGreaterThanOrEqual(4);
+    fixture.componentInstance.i18n.use('es'); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Línea de tiempo'); fixture.destroy();
+  }));
+
 
 });
