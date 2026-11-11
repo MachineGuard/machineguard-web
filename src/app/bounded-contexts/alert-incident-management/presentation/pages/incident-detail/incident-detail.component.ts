@@ -12,7 +12,7 @@ import { EnvironmentalMonitoringService } from '../../../../environmental-monito
 import { SessionService } from '../../../../iam/application/services/session.service';
 import { IncidentService } from '../../../application/services/incident.service';
 import { IncidentDetail } from '../../../domain/models/alert.models';
-import { incidentTone } from '../../incident.presentation';
+import { alertText, formatElapsed, incidentTimeline, incidentTone, severityTone } from '../../incident.presentation';
 
 @Component({
     selector: 'app-incident-detail',
@@ -44,6 +44,14 @@ export class IncidentDetailComponent {
     : !this.detail()?.correctiveActions.length ? 'incident.needsAction'
     : !this.detail()?.withinSafeRange ? 'incident.needsRecovery' : 'incident.ready');
   readonly tone = incidentTone;
+  readonly severityTone = severityTone;
+  private readonly now = signal(new Date());
+  readonly elapsed = computed(() => {
+    const d = this.detail();
+    return d ? formatElapsed(d.alert?.raisedAt ?? d.incident.openedAt, d.incident.resolvedAt ? new Date(d.incident.resolvedAt) : this.now()) : '';
+  });
+  readonly timeline = computed(() => { const d = this.detail(); return d ? incidentTimeline(d, a => alertText(a, this.i18n)) : []; });
+  readonly alertMessage = computed(() => { const a = this.detail()?.alert; return a ? alertText(a, this.i18n) : ''; });
   private readonly reload = new BehaviorSubject<void>(undefined);
   description = '';
   actionNotes = '';
@@ -59,7 +67,7 @@ export class IncidentDetailComponent {
           return of(null);
         }))))));
     }), takeUntilDestroyed()).subscribe(detail => {
-      if (detail) { this.detail.set(detail); this.loadError.set(''); }
+      if (detail) { this.detail.set(detail); this.now.set(new Date()); this.loadError.set(''); }
       this.loading.set(false);
     });
   }

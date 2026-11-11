@@ -11,6 +11,11 @@ export interface AlertDto {
   acknowledgedAt: string | null;
   escalatedAt: string | null;
   historical?: boolean;
+  /** Reading that raised the alert; absent in alerts recorded before the Core exposed it. */
+  environmentalVariable?: string | null;
+  measuredValue?: number | null;
+  minimumValue?: number | null;
+  maximumValue?: number | null;
 }
 export interface AcknowledgementDto {
   alertId: string;

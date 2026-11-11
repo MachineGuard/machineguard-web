@@ -12,9 +12,13 @@ export interface Alert {
   severityLevel?: CoreAlertSeverity;
   status: AlertStatus;
   raisedAt: string;
+  escalatedAt?: string | null;
   contextNote?: string;
   historical?: boolean;
+  /** Reading that raised the alert, used to phrase it in the selected language. */
+  reading?: AlertReading | null;
 }
+export interface AlertReading { variable: string; value: number; minimum: number; maximum: number; }
 export interface Acknowledgement {
   alertId: string;
   acknowledgedAt: string;
