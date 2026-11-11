@@ -1,5 +1,19 @@
 import { StatusTone } from '../../../shared/components/status-badge/status-badge.component';
-import { AlertSeverity, IncidentDetail } from '../domain/models/alert.models';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { Alert, AlertSeverity, IncidentDetail } from '../domain/models/alert.models';
+
+/**
+ * Alert text in the selected language, built from the reading the Core returns. Alerts without that
+ * reading keep the server message.
+ */
+export function alertText(alert: Pick<Alert, 'message' | 'reading' | 'historical'>, i18n: I18nService): string {
+  const r = alert.reading;
+  if (!r) return alert.message;
+  return i18n.t(alert.historical ? 'alert.readingHistorical' : 'alert.reading', {
+    variable: i18n.t('variable.' + r.variable), value: i18n.number(r.value), min: i18n.number(r.minimum),
+    max: i18n.number(r.maximum), unit: i18n.t('unit.' + r.variable),
+  });
+}
 
 export function incidentTone(status: string): StatusTone {
   return status === 'RESOLVED' || status === 'CLOSED' ? 'normal'
@@ -23,10 +37,10 @@ export type TimelineKey = 'raised' | 'acknowledged' | 'escalated' | 'action' | '
 export interface TimelineStep { id: string; key: TimelineKey; at: string | null; detail: string | null; done: boolean; }
 
 /** Builds the incident timeline from the detail the Core already returns: raised, acknowledged, escalated, actions, resolved. */
-export function incidentTimeline(detail: IncidentDetail): TimelineStep[] {
+export function incidentTimeline(detail: IncidentDetail, text: (alert: Alert) => string = a => a.message): TimelineStep[] {
   const { incident, alert, acknowledgement, correctiveActions } = detail;
   const steps: TimelineStep[] = [
-    { id: 'raised', key: 'raised', at: alert?.raisedAt ?? incident.openedAt, detail: alert?.message ?? null, done: true },
+    { id: 'raised', key: 'raised', at: alert?.raisedAt ?? incident.openedAt, detail: alert ? text(alert) : null, done: true },
     { id: 'acknowledged', key: 'acknowledged', at: acknowledgement?.acknowledgedAt ?? null, detail: acknowledgement?.note ?? null, done: !!acknowledgement },
   ];
   if (alert?.escalatedAt) steps.push({ id: 'escalated', key: 'escalated', at: alert.escalatedAt, detail: null, done: true });

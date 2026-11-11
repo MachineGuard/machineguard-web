@@ -12,7 +12,7 @@ import { EnvironmentalMonitoringService } from '../../../../environmental-monito
 import { SessionService } from '../../../../iam/application/services/session.service';
 import { IncidentService } from '../../../application/services/incident.service';
 import { IncidentDetail } from '../../../domain/models/alert.models';
-import { formatElapsed, incidentTimeline, incidentTone, severityTone } from '../../incident.presentation';
+import { alertText, formatElapsed, incidentTimeline, incidentTone, severityTone } from '../../incident.presentation';
 
 @Component({
     selector: 'app-incident-detail',
@@ -50,7 +50,8 @@ export class IncidentDetailComponent {
     const d = this.detail();
     return d ? formatElapsed(d.alert?.raisedAt ?? d.incident.openedAt, d.incident.resolvedAt ? new Date(d.incident.resolvedAt) : this.now()) : '';
   });
-  readonly timeline = computed(() => { const d = this.detail(); return d ? incidentTimeline(d) : []; });
+  readonly timeline = computed(() => { const d = this.detail(); return d ? incidentTimeline(d, a => alertText(a, this.i18n)) : []; });
+  readonly alertMessage = computed(() => { const a = this.detail()?.alert; return a ? alertText(a, this.i18n) : ''; });
   private readonly reload = new BehaviorSubject<void>(undefined);
   description = '';
   actionNotes = '';

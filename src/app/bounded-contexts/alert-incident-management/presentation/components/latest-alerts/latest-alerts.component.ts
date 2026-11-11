@@ -14,6 +14,7 @@ import {
   StatusTone,
 } from '../../../../../shared/components/status-badge/status-badge.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
+import { alertText } from '../../incident.presentation';
 @Component({
     selector: 'app-latest-alerts',
     imports: [RouterLink, IconComponent, TranslatePipe],
@@ -23,6 +24,7 @@ import { IconComponent } from '../../../../../shared/components/icon/icon.compon
 })
 export class LatestAlertsComponent {
   readonly i18n = inject(I18nService);
+  text(alert: Alert): string { return alertText(alert, this.i18n); }
   get requiredCount(): number {
     return this.alerts.filter(
       (alert) =>
