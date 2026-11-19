@@ -71,6 +71,9 @@
         }
       </button>
     </form>
+    @if (hostedDemo) {
+      <p class="demo-notice">{{ "login.hostedDemoNotice" | t }}</p>
+    }
     <footer>
       <span>{{ "common.terms" | t }}</span><span aria-hidden="true">&middot;</span
       ><span>{{ "common.privacy" | t }}</span><span aria-hidden="true">&middot;</span

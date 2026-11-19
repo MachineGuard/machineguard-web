@@ -51,6 +51,7 @@
   "login.emailPlaceholder": "tu@empresa.com",
   "login.emailError": "Ingresa un correo electrónico válido.",
   "login.password": "Contraseña",
+  "login.hostedDemoNotice": "El servidor se apaga sin uso; la primera respuesta puede tardar un minuto.",
   "login.passwordError": "Ingresa tu contraseña.",
   "login.show": "Mostrar contraseña",
   "login.hide": "Ocultar contraseña",
