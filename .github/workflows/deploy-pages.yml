@@ -33,8 +33,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Point the build to the public Core API
+        if: ${{ vars.CORE_API_URL != '' }}
+        run: sed -i "s#apiBaseUrl: '/api/v1'#apiBaseUrl: '${{ vars.CORE_API_URL }}/api/v1'#" src/environments/environment.production.ts
+
       - name: Build Angular
         run: npm run build -- --base-href=/machineguard-web/
+
+      - name: Serve deep links through the SPA
+        run: cp dist/machineguard-web/browser/index.html dist/machineguard-web/browser/404.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
