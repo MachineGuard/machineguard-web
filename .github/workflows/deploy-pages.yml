@@ -35,7 +35,10 @@ jobs:
 
       - name: Point the build to the public Core API
         if: ${{ vars.CORE_API_URL != '' }}
-        run: sed -i "s#apiBaseUrl: '/api/v1'#apiBaseUrl: '${{ vars.CORE_API_URL }}/api/v1'#" src/environments/environment.production.ts
+        env:
+          CORE_API_URL: ${{ vars.CORE_API_URL }}
+        run: |
+          sed -i "s#apiBaseUrl: '/api/v1'#apiBaseUrl: '${CORE_API_URL}/api/v1'#" src/environments/environment.production.ts
 
       - name: Build Angular
         run: npm run build -- --base-href=/machineguard-web/
