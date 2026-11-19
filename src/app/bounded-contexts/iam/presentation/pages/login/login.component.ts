@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '../../../../../core/i18n/translate.pipe';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { LoginShowcaseComponent } from './login-showcase.component';
+import { environment } from '../../../../../../environments/environment';
 import { SessionService } from '../../../application/services/session.service';
 
 @Component({
@@ -16,6 +17,7 @@ import { SessionService } from '../../../application/services/session.service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
+  readonly hostedDemo = /^https?:\/\//.test(environment.apiBaseUrl);
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);

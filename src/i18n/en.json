@@ -51,6 +51,7 @@
   "login.emailPlaceholder": "you@company.com",
   "login.emailError": "Enter a valid email address.",
   "login.password": "Password",
+  "login.hostedDemoNotice": "The server sleeps when idle; the first response may take a minute.",
   "login.passwordError": "Enter your password.",
   "login.show": "Show password",
   "login.hide": "Hide password",
